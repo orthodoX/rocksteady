@@ -1,0 +1,5 @@
+= render 'detail_header'
+
+.container
+  .tab-content
+    = react_component('ImageSelector', imageListEndpoint: api_app_images_path(@app), deployEndpoint: api_app_deploy_path(@app), repositoryName: @app.ecr_repository)

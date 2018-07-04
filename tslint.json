@@ -1,0 +1,33 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended", "tslint-react"
+    ],
+    "jsRules": {},
+    "rules": {
+      "no-switch-case-fall-through": true,
+      "no-console": false,
+      "interface-name": false,
+      "indent": [
+        true,
+        "spaces",
+        2
+      ],
+      "quotemark": [
+        true,
+        "single"
+      ],
+      "semicolon": [
+        true,
+        "always"
+      ],
+      "jsx-curly-spacing": [
+        true,
+        "always"
+      ],
+      "curly": false,
+      "member-ordering": false,
+      "max-classes-per-file": false
+    },
+    "rulesDirectory": []
+}

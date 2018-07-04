@@ -1,0 +1,8 @@
+- if flash.any?
+  .container-fluid.alert-container
+    - if flash[:notice]
+      .alert.alert-success= flash[:notice]
+    - if flash[:warning]
+      .alert.alert-warning= flash[:warning]
+    - if flash[:error]
+      .alert.alert-danger= flash[:error]

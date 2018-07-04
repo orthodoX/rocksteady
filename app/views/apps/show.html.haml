@@ -1,0 +1,16 @@
+= render 'detail_header'
+
+.container
+  .tab-content
+    %dl
+      %dt App name
+      %dd= @app.name
+      - if @app.description.present?
+        %dt Description
+        %dd= @app.description
+      %dt ECR repository
+      %dd= @app.ecr_repository
+      %dt Created at
+      %dd #{ @app.created_at } (#{ time_ago_in_words(@app.created_at) } ago)
+      %dt Last updated
+      %dd #{ @app.updated_at } (#{ time_ago_in_words(@app.updated_at) } ago)

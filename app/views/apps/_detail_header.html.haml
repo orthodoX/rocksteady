@@ -1,0 +1,25 @@
+- content_for :breadcrumbs do
+  = link_to 'Apps', apps_path, class: 'breadcrumb-item'
+  %span.breadcrumb-item.active #{ @app.name }
+
+- content_for :toolbar do
+  = button_to "Delete #{ @app.name }", app_path(@app), method: :delete, class: 'btn btn-danger', data: { confirm: "Are you sure you want to delete #{ @app.name }?"}
+  = link_to '← Return to apps', apps_path, class: 'btn btn-secondary'
+
+.container.app-title
+  %h2
+    = @app.name
+    = react_component('StatusBadge', { endpoint: api_app_status_path(@app) }, tag: :span)
+
+.container
+  %ul.nav.nav-tabs
+    %li.nav-item
+      %a.nav-link{ href: app_path(@app), class: (:active if controller.action_name == 'show') } Overview
+    %li.nav-item
+      %a.nav-link{ href: job_spec_app_path(@app), class: (:active if controller.action_name == 'job_spec') } Job spec
+    %li.nav-item
+      %a.nav-link{ href: nomad_app_path(@app), class: (:active if controller.action_name == 'nomad') } Nomad status
+    %li.nav-item
+      %a.nav-link{ href: deploy_app_path(@app), class: (:active if controller.action_name == 'deploy') } Deploy
+    %li.nav-item
+      %a.nav-link{ href: edit_app_path(@app), class: (:active if controller.action_name == 'edit' || controller.action_name == 'update' ) } Edit settings

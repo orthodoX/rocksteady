@@ -1,0 +1,5 @@
+= render 'detail_header'
+
+.container
+  .tab-content
+    = react_component('NomadStatus', endpoint: api_app_nomad_status_path(@app))

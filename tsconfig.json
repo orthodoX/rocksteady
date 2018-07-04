@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "declaration": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": ["es2017", "dom", "dom.iterable"],
+    "module": "es6",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "target": "es6",
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "strict": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "typeRoots" : ["node_modules/@types", "app/javascript/typings"],
+    "paths": {
+      "*": [
+        "app/javascript/*"
+      ]
+    }
+  },
+  "exclude": [
+    "**/*.spec.ts",
+    "node_modules",
+    "public"
+  ],
+  "compileOnSave": false
+}
