@@ -1,10 +1,10 @@
 class JobSpec
-  attr_reader :app, :docker_image_uri
-  private :app, :docker_image_uri
+  attr_reader :app, :docker_image_name
+  private :app, :docker_image_name
 
-  def initialize(app, docker_image_uri)
+  def initialize(app, docker_image_name)
     @app = app
-    @docker_image_uri = docker_image_uri
+    @docker_image_name = docker_image_name
   end
 
   def as_json(*)
@@ -13,7 +13,7 @@ class JobSpec
     base[:ID] = app.name
     base[:TaskGroups].each do |task_group|
       task_group[:Tasks].each do |task|
-        task[:Config][:image] = docker_image_uri
+        task[:Config][:image] = docker_image_name
       end
     end
 
