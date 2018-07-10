@@ -12,7 +12,7 @@
     = f.text_area :description, class: 'form-control'
     %small.form-text.text-muted A short description of this app's purpose.
 
-  .form-group
+  .form-group.app-image-source-selector
     = f.label :image_source, 'Image source'
     .btn-group.btn-group-toggle{ data: { toggle: :buttons} }
       = f.label :image_source_dockerhub, class: 'btn btn-light' do
@@ -29,13 +29,14 @@
     = f.text_field :repository_name, class: 'form-control'
     %small.form-text.text-muted Name of the repository to use for this app, including namespace (e.g. 'f1000-collector', 'library/memcached')
 
-  .form-group.form-check
-    = f.check_box :auto_deploy, class: 'form-check-input'
-    = f.label :auto_deploy, "Auto-deploy builds"
-    .div.auto-deploy-input
-      = f.text_field :auto_deploy_branch, class: 'form-control', placholder: 'Branch to automatically deploy.'
+  .form-group.auto-deploy-field
+    .form-group.form-check
+      = f.check_box :auto_deploy, class: 'form-check-input'
+      = f.label :auto_deploy, "Auto-deploy new ECR images from branch"
+      %small.form-text.text-muted Tick to automatically deploy this application when new images are pushed to ECR from the specified branch.
+      .auto-deploy-input.form-group
+        = f.text_field :auto_deploy_branch, class: 'form-control', placeholder: 'Branch to automatically deploy.'
 
-    %small.form-text.text-muted Tick to automatically deploy builds on a specified branch.
 
   .form-group.required
     = f.label :job_spec, 'JSON job spec'
