@@ -16,6 +16,7 @@ gem 'turbolinks'
 gem 'nomad'
 gem 'aws-sdk-ecr'
 gem 'http'
+gem 'hcl-checker'
 
 group :test do
   gem 'rspec-rails'
