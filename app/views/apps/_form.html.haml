@@ -1,0 +1,35 @@
+= form_for @app do |f|
+  = form_errors(@app)
+
+  - unless @app.persisted?
+    .form-group.required
+      = f.label :name
+      = f.text_field :name, class: 'form-control'
+      %small.form-text.text-muted App names can contain lowercase alphanumerics and dashes only.
+
+  .form-group
+    = f.label :description
+    = f.text_area :description, class: 'form-control'
+    %small.form-text.text-muted A short description of this app's purpose.
+
+  .form-group.required
+    = f.label :ecr_repository, "ECR repository"
+    = f.text_field :ecr_repository, class: 'form-control'
+    %small.form-text.text-muted Amazon ECR repository to use for this app (e.g. 'f1000-collector')
+
+  .form-group.form-check
+    = f.check_box :auto_deploy, class: 'form-check-input'
+    = f.label :auto_deploy, "Auto-deploy builds"
+    .div.auto-deploy-input
+      = f.text_field :auto_deploy_branch, class: 'form-control', placholder: 'Branch to automatically deploy.'
+
+    %small.form-text.text-muted Tick to automatically deploy builds on a specified branch.
+
+  .form-group.required
+    = f.label :job_spec, 'JSON job spec'
+    = f.text_area :job_spec, class: 'form-control text-monospace', rows: 20
+    %small.form-text.text-muted Job spec for this application. The job ID and Docker image specification will be overriden.
+
+  .form-group.buttons
+    = f.submit class: 'btn btn-primary'
+    = link_to 'Cancel', apps_path, class: 'btn btn-secondary'
