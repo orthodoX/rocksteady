@@ -6,6 +6,8 @@ Rails.start();
 
 import hljs from 'highlight.js';
 
+import 'bootstrap.native/dist/bootstrap-native-v4';
+
 document.addEventListener('turbolinks:load', () => {
   document.querySelectorAll('pre code').forEach((block) => hljs.highlightBlock(block));
 });
