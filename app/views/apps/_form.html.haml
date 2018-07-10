@@ -12,6 +12,18 @@
     = f.text_area :description, class: 'form-control'
     %small.form-text.text-muted A short description of this app's purpose.
 
+  .form-group
+    = f.label :image_source, 'Image source'
+    .btn-group.btn-group-toggle{ data: { toggle: :buttons} }
+      = f.label :image_source_dockerhub, class: 'btn btn-light' do
+        = f.radio_button :image_source, :dockerhub
+        Docker Hub
+      = f.label :image_source_ecr, class: 'btn btn-light' do
+        = f.radio_button :image_source, :ecr
+        ECR
+
+    %small.form-text.text-muted Select whether images will be sourced from Docker Hub or a private ECR repository.
+
   .form-group.required
     = f.label :ecr_repository, "ECR repository"
     = f.text_field :ecr_repository, class: 'form-control'

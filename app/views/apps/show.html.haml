@@ -8,6 +8,8 @@
       - if @app.description.present?
         %dt Description
         %dd= @app.description
+      %dt Image source
+      %dd= @app.image_source
       %dt ECR repository
       %dd= @app.ecr_repository
       %dt Created at

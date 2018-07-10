@@ -6,10 +6,11 @@ Rails.start();
 
 import hljs from 'highlight.js';
 
-import 'bootstrap.native/dist/bootstrap-native-v4';
+import bootstrap from 'bootstrap.native';
 
 document.addEventListener('turbolinks:load', () => {
   document.querySelectorAll('pre code').forEach((block) => hljs.highlightBlock(block));
+  document.querySelectorAll('[data-toggle="buttons"]').forEach((button) => new bootstrap.Button(button));
 });
 
 import ImageSelector from 'components/ImageSelector';
