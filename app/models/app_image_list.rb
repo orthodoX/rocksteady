@@ -28,7 +28,7 @@ class AppImageList
   # TODO: should we consider pagination? This will return a maximum of 100
   # images. Maybe we don't care?
   def ecr_images
-    ecr_client.describe_images(repository_name: app.ecr_repository).image_details
+    ecr_client.describe_images(repository_name: app.repository_name).image_details
   rescue Aws::ECR::Errors::RepositoryNotFoundException
     []
   end

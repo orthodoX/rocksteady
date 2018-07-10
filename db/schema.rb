@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180710104439) do
+ActiveRecord::Schema.define(version: 20180710112004) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 20180710104439) do
   create_table "apps", force: :cascade do |t|
     t.text "name", null: false
     t.text "description"
-    t.text "ecr_repository", null: false
+    t.text "repository_name", null: false
     t.text "env_template"
     t.boolean "auto_deploy", default: false
     t.text "auto_deploy_branch", default: "master"

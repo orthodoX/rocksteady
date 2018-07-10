@@ -10,8 +10,8 @@
         %dd= @app.description
       %dt Image source
       %dd= @app.image_source
-      %dt ECR repository
-      %dd= @app.ecr_repository
+      %dt Repository name
+      %dd= @app.repository_name
       %dt Created at
       %dd #{ @app.created_at } (#{ time_ago_in_words(@app.created_at) } ago)
       %dt Last updated

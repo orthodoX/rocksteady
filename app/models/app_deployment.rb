@@ -18,7 +18,7 @@ class AppDeployment
   end
 
   def image_uri
-    ENV.fetch('ECR_BASE') + '/' + app.ecr_repository + ':' + tag
+    ENV.fetch('ECR_BASE') + '/' + app.repository_name + ':' + tag
   end
 
   def nomad_client

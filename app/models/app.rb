@@ -3,7 +3,7 @@ class App < ApplicationRecord
 
   validates :name, uniqueness: true, presence: true, format: { with: NAME_FORMAT }
   validates :image_source, inclusion: { in: %w[dockerhub ecr] }
-  validates :ecr_repository, presence: true
+  validates :repository_name, presence: true
   validates :job_spec, presence: true
   validate :check_job_spec_is_json
 

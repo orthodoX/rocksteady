@@ -68,7 +68,7 @@ class AppsController < ApplicationController
       :name,
       :description,
       :image_source,
-      :ecr_repository,
+      :repository_name,
       :job_spec,
       :auto_deploy,
       :auto_deploy_branch

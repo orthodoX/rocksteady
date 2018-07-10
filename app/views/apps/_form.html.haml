@@ -25,9 +25,9 @@
     %small.form-text.text-muted Select whether images will be sourced from Docker Hub or a private ECR repository.
 
   .form-group.required
-    = f.label :ecr_repository, "ECR repository"
-    = f.text_field :ecr_repository, class: 'form-control'
-    %small.form-text.text-muted Amazon ECR repository to use for this app (e.g. 'f1000-collector')
+    = f.label :repository_name, "Repository name"
+    = f.text_field :repository_name, class: 'form-control'
+    %small.form-text.text-muted Name of the repository to use for this app, including namespace (e.g. 'f1000-collector', 'library/memcached')
 
   .form-group.form-check
     = f.check_box :auto_deploy, class: 'form-check-input'
