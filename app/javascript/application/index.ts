@@ -6,8 +6,11 @@ Rails.start();
 
 import hljs from 'highlight.js';
 
+import bootstrap from 'bootstrap.native';
+
 document.addEventListener('turbolinks:load', () => {
   document.querySelectorAll('pre code').forEach((block) => hljs.highlightBlock(block));
+  document.querySelectorAll('[data-toggle="buttons"]').forEach((button) => new bootstrap.Button(button));
 });
 
 import ImageSelector from 'components/ImageSelector';
@@ -16,3 +19,23 @@ import StatusBadge from 'components/StatusBadge';
 
 import WebpackerReact from 'webpacker-react';
 WebpackerReact.setup({ StatusBadge, ImageSelector, NomadStatus });
+
+document.addEventListener('turbolinks:load', () => {
+  document.querySelectorAll('.auto-deploy-field').forEach((field) => {
+    const selectors = Array.from(document.querySelectorAll('.app-image-source-selector input')) as HTMLInputElement[];
+    if (!selectors.length) return;
+
+    const ecrSelector = selectors.find((s) => s.value === 'ecr');
+
+    const updater = () => {
+      if (ecrSelector && ecrSelector.checked) {
+        field.classList.remove('hidden');
+      } else {
+        field.classList.add('hidden');
+      }
+    };
+
+    updater();
+    selectors.forEach((selector) => selector.addEventListener('click', updater));
+  });
+});

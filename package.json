@@ -13,6 +13,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-react": "^6.24.1",
     "bootstrap": "^4.0.0",
+    "bootstrap.native": "^2.0.23",
     "caniuse-lite": "^1.0.30000862",
     "eslint": "^4.16.0",
     "eslint-plugin-react": "^7.6.0",

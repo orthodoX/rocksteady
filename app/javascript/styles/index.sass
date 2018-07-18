@@ -58,9 +58,19 @@ h5
   &.required label:after
     content: " *"
     color: red
+  .btn-group-toggle
+    display: block
+    .active
+      background-color: #28a745 !important
+      border-color: #28a745 !important
+      color: white !important
 
+.auto-deploy-field
+  &.hidden
+    display: none
 .auto-deploy-input
   display: none
+  padding-top: 0.5rem
   .form-check-input#app_auto_deploy:checked ~ &
     display: block
 

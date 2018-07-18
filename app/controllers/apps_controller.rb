@@ -67,7 +67,8 @@ class AppsController < ApplicationController
     params.require(:app).permit(
       :name,
       :description,
-      :ecr_repository,
+      :image_source,
+      :repository_name,
       :job_spec,
       :auto_deploy,
       :auto_deploy_branch
