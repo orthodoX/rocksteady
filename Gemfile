@@ -16,7 +16,7 @@ gem 'turbolinks'
 gem 'nomad'
 gem 'aws-sdk-ecr'
 gem 'http'
-gem 'hcl-checker'
+gem 'rouge', github: 'jneen/rouge'
 
 group :test do
   gem 'rspec-rails'

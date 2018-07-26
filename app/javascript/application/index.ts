@@ -4,12 +4,9 @@ Turbolinks.start();
 import Rails from 'rails-ujs';
 Rails.start();
 
-import hljs from 'highlight.js';
-
 import bootstrap from 'bootstrap.native';
 
 document.addEventListener('turbolinks:load', () => {
-  document.querySelectorAll('pre code').forEach((block) => hljs.highlightBlock(block));
   document.querySelectorAll('[data-toggle="buttons"]').forEach((button) => new bootstrap.Button(button));
 });
 

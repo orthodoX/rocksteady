@@ -2,6 +2,5 @@
 
 .container
   .tab-content
-    %pre
-      %code.json
-        = @app.job_spec
+    %pre.code-highlight
+      = format_job_spec(@app.job_spec)

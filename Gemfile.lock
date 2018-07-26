@@ -1,3 +1,9 @@
+GIT
+  remote: https://github.com/jneen/rouge.git
+  revision: 11aaec03cd9a7c878d9b30ac0b89689dd62b1a9c
+  specs:
+    rouge (3.1.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -97,7 +103,6 @@ GEM
       html2haml (>= 1.0.1)
       railties (>= 4.0.1)
     hashdiff (0.3.7)
-    hcl-checker (1.0.6)
     house_style (1.4.0)
       rubocop (~> 0.52, < 0.53)
       rubocop-rspec (~> 1.15)
@@ -270,7 +275,6 @@ DEPENDENCIES
   dotenv-rails
   guard-rspec
   haml-rails
-  hcl-checker
   house_style
   http
   nomad
@@ -278,6 +282,7 @@ DEPENDENCIES
   pry-rails
   puma (~> 3.7)
   rails (~> 5.1.5)
+  rouge!
   rspec-rails
   simplecov
   turbolinks
