@@ -39,9 +39,9 @@
 
 
   .form-group.required
-    = f.label :job_spec, 'JSON job spec'
+    = f.label :job_spec, 'Nomad job spec'
     = f.text_area :job_spec, class: 'form-control text-monospace', rows: 20
-    %small.form-text.text-muted Job spec for this application. The job ID and Docker image specification will be overriden.
+    %small.form-text.text-muted Nomad job specification in HCL format. The job name and docker image fields will be ignored.
 
   .form-group.buttons
     = f.submit class: 'btn btn-primary'

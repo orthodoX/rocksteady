@@ -8,7 +8,7 @@ class JobSpec
   end
 
   def as_json(*)
-    base = app_spec
+    base = json_spec
 
     base[:ID] = app.name
     base[:TaskGroups].each do |task_group|
@@ -20,7 +20,7 @@ class JobSpec
     base
   end
 
-  def app_spec
-    @app_spec ||= JSON.parse(app.job_spec, symbolize_names: true)
+  def json_spec
+    @json_spec = HclParser.new(app.job_spec).parsed
   end
 end

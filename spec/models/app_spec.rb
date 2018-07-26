@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe App do
   def app_named(name)
-    App.create(name: name, repository_name: 'test', job_spec: '{}')
+    App.create(name: name, repository_name: 'test', job_spec: 'job {}')
   end
 
   describe 'name' do

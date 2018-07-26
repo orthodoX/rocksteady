@@ -8,7 +8,7 @@ class AppDeployment
   end
 
   def deploy!
-    nomad_client.job.create({Job: job_spec}.to_json)
+    nomad_client.job.create({ Job: job_spec }.to_json)
   end
 
   private

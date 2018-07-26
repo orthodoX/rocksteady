@@ -5,7 +5,7 @@ class App < ApplicationRecord
   validates :image_source, inclusion: { in: %w[dockerhub ecr] }
   validates :repository_name, presence: true
   validates :job_spec, presence: true
-  validate :check_job_spec_is_json
+  validate :check_job_spec_is_hcl
 
   def to_param
     name
@@ -13,9 +13,8 @@ class App < ApplicationRecord
 
   private
 
-  def check_job_spec_is_json
-    JSON.parse(job_spec || '')
-  rescue JSON::ParserError
-    errors.add(:job_spec, 'must be a valid JSON job spec')
+  def check_job_spec_is_hcl
+    return if HCL::Checker.valid? job_spec
+    errors.add(:job_spec, 'must be a valid HCL job spec')
   end
 end
