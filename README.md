@@ -24,7 +24,7 @@ rails s
 [RockSteady is also available as a Docker image](https://hub.docker.com/r/powerrhino/rocksteady/), and is capable of self-hosting if a Nomad cluster is available.
 
 
-## Configuration
+## Configuration
 
 Rocksteady is configured using the following environment variables:
 
@@ -44,6 +44,6 @@ Alternatively, if you have an appropriate profile in place:
 
 - `AWS_PROFILE` – Locally-configured AWS profile supplying an AWS keypair and region.
 
-## Bootstrapping
+## Bootstrapping
 
 RockSteady is capable of self-hosting as a job running on a Nomad cluster. An example job spec is included in [nomad_job.hcl](./nomad_job.hcl) which can be customised as appropriate for your environment.
