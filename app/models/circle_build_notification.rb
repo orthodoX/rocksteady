@@ -7,7 +7,7 @@ class CircleBuildNotification
   end
 
   def success?
-    params[:status] == 'success'
+    params[:outcome] == 'success'
   end
 
   def finished?
