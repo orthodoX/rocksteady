@@ -71,8 +71,8 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
 
       return (
         <div className={ className } key={ image.id } onClick={ () => this.props.onSelect(image) }>
-          <div className='d-flex w-100 justify-content-between align-items-center mb-2'>
-            <span className='tags'>{ this.taggify(image.tags, isActive) }</span>
+          <div className='d-flex w-100 justify-content-between align-items-start mb-2'>
+            <span className='tags d-flex flex-wrap'>{ this.taggify(image.tags, isActive) }</span>
             <small>{ image.timestamp.locale('en-gb').calendar() }</small>
           </div>
           <small>{ image.fileSize }</small>
