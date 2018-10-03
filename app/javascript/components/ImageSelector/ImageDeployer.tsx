@@ -75,6 +75,14 @@ export default class ImageDeployer extends React.Component<ImageDeployerProps, I
   get uri() {
     if (!this.props.selectedImage) return '';
 
-    return this.props.endpoint + '/' + this.props.selectedImage.tags[0];
+    return this.props.endpoint + '/' + this.deployTag;
+  }
+
+  get deployTag() {
+    if (!this.props.selectedImage) return '';
+
+    const buildTag = this.props.selectedImage.tags.find((t) => !!t.match(/^build/));
+
+    return buildTag || this.props.selectedImage.tags[0];
   }
 }
