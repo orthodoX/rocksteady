@@ -1,3 +1,5 @@
+DOCKER_TAG = /\w[\w.-]{,127}/.freeze
+
 Rails.application.routes.draw do
   root to: redirect('/apps')
 
@@ -13,7 +15,7 @@ Rails.application.routes.draw do
     get 'app/:id/status' => 'app#status', :as => :app_status
     get 'app/:id/nomad_status' => 'app#nomad_status', :as => :app_nomad_status
     get 'app/:id/images' => 'app#images', :as => :app_images
-    post 'app/:id/deploy/(:tag)' => 'app#deploy', :as => :app_deploy
+    post 'app/:id/deploy/(:tag)' => 'app#deploy', :as => :app_deploy, :tag => DOCKER_TAG
   end
 
   post '/webhook/:app' => 'webhook#handle'
