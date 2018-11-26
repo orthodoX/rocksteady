@@ -4,20 +4,16 @@ class WebhookController < ActionController::API
 
     if autodeployed_apps.any?
       head 200
-    elsif apps.any?
-      head 204
     else
-      head 404
+      head 204
     end
   end
 
   def deploy_app
     if app.trigger_auto_deploy(notification)
       head 200
-    elsif app
-      head 204
     else
-      head 404
+      head 204
     end
   end
 
