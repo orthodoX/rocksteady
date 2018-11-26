@@ -1,7 +1,18 @@
 class WebhookController < ActionController::API
-  def handle
-    if app && should_deploy?
-      deploy
+  def deploy
+    autodeployed_apps = apps.select { |app| app.trigger_auto_deploy(notification) }
+
+    if autodeployed_apps.any?
+      head 200
+    elsif apps.any?
+      head 204
+    else
+      head 404
+    end
+  end
+
+  def deploy_app
+    if app.trigger_auto_deploy(notification)
       head 200
     elsif app
       head 204
@@ -12,11 +23,8 @@ class WebhookController < ActionController::API
 
   private
 
-  def should_deploy?
-    app.auto_deploy? &&
-    app.auto_deploy_branch == notification.branch &&
-    notification.finished? &&
-    notification.success?
+  def apps
+    @apps ||= App.where(repository_name: notification.repository_name)
   end
 
   def app
@@ -25,13 +33,5 @@ class WebhookController < ActionController::API
 
   def notification
     @notification ||= CircleBuildNotification.new(params[:payload])
-  end
-
-  def image_tag
-    "build-#{notification.build_number}"
-  end
-
-  def deploy
-    AppDeployment.new(app, image_tag).deploy!
   end
 end

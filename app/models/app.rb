@@ -9,4 +9,13 @@ class App < ApplicationRecord
   def to_param
     name
   end
+
+  def trigger_auto_deploy(notification)
+    return unless auto_deploy? &&
+      auto_deploy_branch == notification.branch &&
+      notification.finished? &&
+      notification.success?
+
+    AppDeployment.new(self, "build-#{notification.build_number}").deploy!
+  end
 end

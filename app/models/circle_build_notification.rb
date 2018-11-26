@@ -21,4 +21,8 @@ class CircleBuildNotification
   def branch
     params[:branch]
   end
+
+  def repository_name
+    params[:repository_name]
+  end
 end
