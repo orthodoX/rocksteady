@@ -18,7 +18,9 @@ Rails.application.routes.draw do
     post 'app/:id/deploy/(:tag)' => 'app#deploy', :as => :app_deploy, :tag => DOCKER_TAG
   end
 
-  post '/webhook/:app' => 'webhook#handle'
+  post '/webhook' => 'webhook#deploy'
+  post '/webhook/:app' => 'webhook#deploy_app'
+
 
   get '/ping' => proc { [200, {}, ['']] }
 end
