@@ -23,11 +23,18 @@ class AppImageList
   private
 
   def ecr_image_list
-    ecr_images.map(&method(:ecr_image_data)).sort_by { |i| i[:timestamp] }.reverse
+    ecr_images
+      .map { |image| ecr_image_data(image) }
+      .sort_by { |i| i[:timestamp] }
+      .reverse
   end
 
   def dockerhub_image_list
-    dockerhub_tags.map(&method(:dockerhub_tag_to_image)).compact.sort_by { |i| i[:timestamp] }.reverse
+    dockerhub_tags
+      .map { |tag| dockerhub_tag_to_image(tag) }
+      .compact
+      .sort_by { |i| i[:timestamp] }
+      .reverse
   end
 
   def ecr_image_data(image)
@@ -51,16 +58,14 @@ class AppImageList
     }
   end
 
-  def ecr_client
-    @ecr_client ||= Aws::ECR::Client.new(profile: ENV['AWS_PROFILE'])
-  end
-
-  # TODO: should we consider pagination? This will return a maximum of 100
-  # images. Maybe we don't care?
   def ecr_images
-    ecr_client.describe_images(repository_name: app.repository_name).image_details
+    ecr_client.describe_images(repository_name: app.repository_name).flat_map(&:image_details)
   rescue Aws::ECR::Errors::RepositoryNotFoundException
     []
+  end
+
+  def ecr_client
+    @ecr_client ||= Aws::ECR::Client.new(profile: ENV['AWS_PROFILE'])
   end
 
   # TODO: also consider paginating this
