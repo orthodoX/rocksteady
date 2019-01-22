@@ -180,3 +180,28 @@ pre
   .hljs
     border-radius: 5px
     padding: 2rem
+
+.collapsible
+  cursor: pointer
+  .arrow:before
+    content: ' '
+    display: inline-block
+    border-top: 5px solid transparent
+    border-bottom: 5px solid transparent
+    border-left: 5px solid currentColor
+    vertical-align: middle
+    margin-right: .7rem
+
+  .arrow, .repo-name
+    float: left
+
+.collapsible.active .arrow
+  transform: rotate(90deg) translateX(6px) translateY(8px)
+
+.apps
+  width: auto
+
+.appscontent
+  max-height: 0
+  overflow: hidden
+  transition: max-height 0.2s ease-out

@@ -36,3 +36,22 @@ document.addEventListener('turbolinks:load', () => {
     selectors.forEach((selector) => selector.addEventListener('click', updater));
   });
 });
+
+document.addEventListener('turbolinks:load', () => {
+  const coll = document.getElementsByClassName('collapsible');
+  for (let i = 0; i < coll.length; i++) {
+    coll[i].addEventListener('click', (event) => {
+      if (event && event.currentTarget) {
+        let block = event.currentTarget as Element;
+        block.classList.toggle('active');
+
+        let content = block.nextElementSibling as HTMLElement;
+        if (content.style.maxHeight) {
+          content.style.maxHeight = null;
+        } else {
+          content.style.maxHeight = content.scrollHeight + "px";
+        }
+      }
+    });
+  }
+});

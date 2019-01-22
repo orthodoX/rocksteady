@@ -1,6 +1,6 @@
 class AppsController < ApplicationController
   def index
-    @apps = App.all.order(:name)
+    @repos = App.all.group_by(&:repository_name).sort_by { |repo_name, _| repo_name }
   end
 
   def show
