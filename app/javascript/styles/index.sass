@@ -14,8 +14,8 @@
   padding-bottom: 0
 
 .toolbar-container
-  background: #eee
   display: flex
+  background: #eee
   .breadcrumbs
     flex-grow: 1
     padding: 0.5rem
@@ -44,13 +44,12 @@ h5
   .badge
     margin-left: 1rem
 
-
 // Form style tweaks
 ////////////////////////////////////////////////////////////////////////////////
 
 .form-errors
-  padding: 1rem
   margin-bottom: 2rem
+  padding: 1rem
   strong
     display: block
     margin-bottom: 1rem
@@ -61,13 +60,13 @@ h5
   &.buttons
     margin-top: 2rem
   &.required label:after
-    content: " *"
     color: red
+    content: " *"
   .btn-group-toggle
     display: block
     .active
-      background-color: #28a745 !important
       border-color: #28a745 !important
+      background-color: #28a745 !important
       color: white !important
 
 .auto-deploy-field
@@ -78,7 +77,6 @@ h5
   padding-top: 0.5rem
   .form-check-input#app_auto_deploy:checked ~ &
     display: block
-
 
 // Tab and content styles
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +96,6 @@ h5
     display: inline
     margin-left: 1rem
 
-
 // Components
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -106,9 +103,9 @@ h5
   h4
     margin-bottom: 2rem
   .badge
+    display: inline
     margin-right: 1rem
     margin-bottom: 0.5rem
-    display: inline
   small
     white-space: nowrap
 
@@ -134,13 +131,12 @@ h5
       width: 50%
       width: 300px
       padding: 1rem
-      text-align: center
-      overflow-y: scroll
       transform: translate(-50%, -50%)
-      background: white
       border-radius: 5px
+      background: white
+      text-align: center
       z-index: 10001
-
+      overflow-y: scroll
 
 .NomadStatus
   dt
@@ -151,10 +147,10 @@ h5
     display: inline-block
     width: 1rem
     height: 1rem
-    background: #888
-    border-radius: 2px
     margin-right: 0.5rem
     margin-bottom: -2px
+    border-radius: 2px
+    background: #888
     &.complete
       background: #0D6426
     &.running
@@ -164,7 +160,6 @@ h5
     &.starting
       background: #007bff
 
-
 // Table customisations
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -172,39 +167,40 @@ table
   td.emptyMessage
     color: #888
 
-
 // Syntax highlighting
 ////////////////////////////////////////////////////////////////////////////////
 
 pre
   .hljs
-    border-radius: 5px
     padding: 2rem
+    border-radius: 5px
 
 // Collapsible repos
 ////////////////////////////////////////////////////////////////////////////////
 
 .collapsible
   cursor: pointer
-  .arrow:before
-    content: ' '
-    display: inline-block
-    border-top: 5px solid transparent
-    border-bottom: 5px solid transparent
-    border-left: 5px solid currentColor
-    vertical-align: middle
-    margin-right: .7rem
+  .arrow
+    &::before
+      display: inline-block
+      margin-right: 0.7rem
+      border-top: 5px solid transparent
+      border-bottom: 5px solid transparent
+      border-left: 5px solid currentColor
+      content: ' '
+      vertical-align: middle
+  .active
+    .arrow
+      transform: rotate(90deg) translateX(6px) translateY(8px)
 
-  .arrow, .repo-name
+  .arrow,
+  .repo-name
     float: left
-
-.collapsible.active .arrow
-  transform: rotate(90deg) translateX(6px) translateY(8px)
 
 .apps
   width: auto
 
 .appscontent
   max-height: 0
-  overflow: hidden
   transition: max-height 0.2s ease-out
+  overflow: hidden
