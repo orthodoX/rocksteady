@@ -15,7 +15,7 @@
           %h5.mb-1
             = repo_name
       .appscontent
-        - apps.each do |app|
+        - apps.sort_by { |app| app.name }.each do |app|
           %a.list-group-item.list-group-item-action.flex-column.align-items-start.ml-3.apps{ href: app_path(app) }
             .d-flex.w-100.justify-content-between
               %h5.mb-1
