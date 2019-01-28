@@ -15,7 +15,7 @@ rules:
   empty-line-between-blocks: 0
   empty-args:
     - 2
-    -r
+    -
       include: false
   indentation: 0
   leading-zero:

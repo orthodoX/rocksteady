@@ -6,14 +6,22 @@
 
 .container
   .list-group
-    - if @apps.length.zero?
+    - if @repos.length.zero?
       .list-group-item.list-group-item-light No apps are registered. #{ link_to "Create an app.", new_app_path }
-    - @apps.each do |app|
-      %a.list-group-item.list-group-item-action.flex-column.align-items-start{ href: app_path(app) }
-        .d-flex.w-100.justify-content-between
+    - @repos.each do |repo_name, apps|
+      .list-group-item.list-group-item-action.flex-column.align-items-start.collapsible
+        .arrow
+        .repo-name.d-flex.justify-content-between
           %h5.mb-1
-            = app.name
-            = react_component('StatusBadge', { endpoint: api_app_status_path(app) }, tag: :span)
-          %small Updated #{ time_ago_in_words(app.updated_at) } ago
-        %p.mb-1
-          = app.description
+            = repo_name
+      .appscontent
+        - apps.sort_by { |app| app.name }.each do |app|
+          %a.list-group-item.list-group-item-action.flex-column.align-items-start.ml-3.apps{ href: app_path(app) }
+            .d-flex.w-100.justify-content-between
+              %h5.mb-1
+                = app.name
+                = react_component('StatusBadge', { endpoint: api_app_status_path(app) }, tag: :span)
+              %small Updated #{ time_ago_in_words(app.updated_at) } ago
+            %p.mb-1
+              = app.description
+
