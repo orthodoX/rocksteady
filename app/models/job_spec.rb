@@ -13,7 +13,7 @@ class JobSpec
     base[:ID] = app.name
     base[:TaskGroups].each do |task_group|
       task_group[:Tasks].each do |task|
-        task[:Config][:image] = docker_image_name
+        task[:Config][:image] = docker_image_name if task[:Config][:image].blank?
       end
     end
 
