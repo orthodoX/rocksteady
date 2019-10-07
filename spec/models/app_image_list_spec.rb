@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe AppImageList do
   describe '#as_json' do
     it 'orders images with latest pushed first' do
-      stub_request(:post, 'https://ecr.eu-west-1.amazonaws.com/').to_return(body: <<~JSON)
+      stub_request(:post, 'https://api.ecr.eu-west-1.amazonaws.com/').to_return(body: <<~JSON)
         {
            "imageDetails": [
               {
