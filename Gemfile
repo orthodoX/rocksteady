@@ -6,6 +6,7 @@ git_source(:github) do |repo_name|
 end
 
 gem 'rails', '~> 5.1.5'
+
 gem 'pg'
 gem 'puma', '~> 3.7'
 gem 'webpacker', '>= 4.0.x'
@@ -16,7 +17,7 @@ gem 'turbolinks'
 gem 'nomad'
 gem 'aws-sdk-ecr'
 gem 'http'
-gem 'rouge', github: 'jneen/rouge'
+gem 'rouge'
 
 group :test do
   gem 'rspec-rails'
