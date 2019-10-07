@@ -1,15 +1,18 @@
 inherit_gem:
-  house_style: ruby/rubocop.yml
+  house_style: rails/rubocop.yml
+
 AllCops:
-  TargetRubyVersion: 2.5
   Exclude:
     - bin/*
-    - Gemfile
     - Guardfile
     - vendor/**/*
     - db/**/*
     - node_modules/**/*
     - config/environments/*
+
 Metrics/LineLength:
   Exclude:
     - spec/**/*
+
+Style/ClassAndModuleChildren:
+  Enabled: false

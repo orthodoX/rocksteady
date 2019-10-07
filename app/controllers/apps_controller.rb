@@ -31,7 +31,7 @@ class AppsController < ApplicationController
     @app = App.new(app_params)
 
     if @app.save
-      flash[:notice] = "App has been created"
+      flash[:notice] = 'App has been created'
       redirect_to app_path(@app)
     else
       render action: :new
@@ -41,8 +41,8 @@ class AppsController < ApplicationController
   def update
     @app = current_app
 
-    if @app.update_attributes(app_params)
-      flash[:notice] = "App has been updated. You will need to deploy again for any changes to take effect."
+    if @app.update(app_params)
+      flash[:notice] = 'App has been updated. You will need to deploy again for any changes to take effect.'
       redirect_to app_path(@app)
     else
       render action: :edit
@@ -53,10 +53,10 @@ class AppsController < ApplicationController
     @app = current_app
 
     if AppDeletion.new(@app).delete! && @app.destroy
-      flash[:notice] = "App has been removed from Nomad and deleted"
+      flash[:notice] = 'App has been removed from Nomad and deleted'
       redirect_to action: :index
     else
-      flash[:error] = "Could not delete app"
+      flash[:error] = 'Could not delete app'
       render action: :index
     end
   end
