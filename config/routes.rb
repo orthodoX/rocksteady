@@ -21,6 +21,5 @@ Rails.application.routes.draw do
   post '/webhook' => 'webhook#deploy'
   post '/webhook/:app' => 'webhook#deploy_app'
 
-
   get '/ping' => proc { [200, {}, ['']] }
 end

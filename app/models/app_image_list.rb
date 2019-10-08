@@ -54,7 +54,7 @@ class AppImageList
       id: tag['id'],
       tags: [tag['name']],
       size: image['size'],
-      timestamp: Time.parse(tag['last_updated'])
+      timestamp: Time.zone.parse(tag['last_updated'])
     }
   end
 

@@ -2,8 +2,8 @@ require 'rails_helper'
 
 JOB_RESPONSE = [
   {
-    ID: "test-job",
-    Status: "running",
+    ID: 'test-job',
+    Status: 'running',
     JobSummary: {
       Summary: {
         servers: {
@@ -45,6 +45,5 @@ RSpec.describe AppStatus do
         status: 'not-deployed'
       )
     end
-
   end
 end

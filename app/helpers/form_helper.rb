@@ -4,8 +4,10 @@ module FormHelper
 
     errors = error_rows_from(models)
 
-    content = content_tag(:ul, errors.uniq.join.html_safe)
-    content_tag(:div, "<strong>There was a problem with your form</strong>#{content}".html_safe, class: 'form-errors alert-danger')
+    content_tag(:div,
+                content_tag(:strong, 'There was a problem with your form') +
+                content_tag(:ul, safe_join(errors.uniq)),
+                class: 'form-errors alert-danger')
   end
 
   def error_rows_from(models)
