@@ -30,11 +30,22 @@ class AppsController < ApplicationController
   def create
     @app = App.new(app_params)
 
-    if @app.save
-      flash[:notice] = 'App has been created'
-      redirect_to app_path(@app)
-    else
-      render action: :new
+    respond_to do |format|
+      format.html do
+        if @app.save
+          flash[:notice] = 'App has been created'
+          redirect_to app_path(@app)
+        else
+          render action: :new
+        end
+      end
+      format.json do
+        if @app.save
+          render status: :ok, json: @app
+        else
+          render status: :bad_request, json: @app.errors
+        end
+      end
     end
   end
 
