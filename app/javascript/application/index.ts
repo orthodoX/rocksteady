@@ -13,11 +13,10 @@ document.addEventListener('turbolinks:load', () => {
 import AllocationStatus from 'components/AllocationStatus';
 import DeployedImage from 'components/DeployedImage';
 import ImageSelector from 'components/ImageSelector';
-import NomadStatus from 'components/NomadStatus';
 import StatusBadge from 'components/StatusBadge';
 
 import WebpackerReact from 'webpacker-react';
-WebpackerReact.setup({ StatusBadge, ImageSelector, NomadStatus, AllocationStatus, DeployedImage });
+WebpackerReact.setup({ StatusBadge, ImageSelector, AllocationStatus, DeployedImage });
 
 document.addEventListener('turbolinks:load', () => {
   document.querySelectorAll('.auto-deploy-field').forEach((field) => {

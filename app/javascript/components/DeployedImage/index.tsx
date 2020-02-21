@@ -5,7 +5,7 @@ import React from 'react';
 
 import fetch from 'util/fetch';
 
-import { NomadStatusData } from 'components/NomadStatus';
+import NomadStatusData from 'components/NomadStatus/Data';
 
 interface State {
   loading: boolean;
