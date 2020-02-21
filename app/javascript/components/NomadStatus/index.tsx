@@ -75,29 +75,8 @@ class NomadStatus extends React.Component<NomadStatusProps, NomadStatusState> {
           <dd>{ this.state.data.summary.status }</dd>
           <dt>Deployed image</dt>
           <dd>{ this.deployedImage }</dd>
-          <dt>Instances</dt>
-          <dd>{ this.instances }</dd>
         </dl>
       </div>
-    );
-  }
-
-  private get instances() {
-    if (!this.state.data) return this.errorMessage;
-
-    return (
-      <div className='row instances'>
-        { _.map(this.state.data.summary.allocations, this.instance) }
-       </div>
-    );
-  }
-
-  private instance(count: number, type: string) {
-    return (
-      <span className='col' key={ type }>
-        <span className={ `swatch ${ type }` }/>
-        <small>{ count } { _.capitalize(type) }</small>
-      </span>
     );
   }
 
@@ -120,3 +99,4 @@ class NomadStatus extends React.Component<NomadStatusProps, NomadStatusState> {
 }
 
 export default hot(module)(NomadStatus);
+export { NomadStatusProps, NomadStatusData };
