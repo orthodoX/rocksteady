@@ -7,9 +7,11 @@
   = link_to '← Return to apps', apps_path, class: 'btn btn-secondary'
 
 .container.app-title
-  %h2
-    = @app.name
-    = react_component('StatusBadge', { endpoint: api_app_status_path(@app) }, tag: :span)
+  %div.app-title-container
+    %h2
+      = @app.name
+      = react_component('StatusBadge', { endpoint: api_app_status_path(@app) }, tag: :span)
+    = react_component('DeployedImage', { endpoint: api_app_nomad_status_path(@app) })
   = react_component('AllocationStatus', { endpoint: api_app_nomad_status_path(@app) }, class: 'AllocationStatus-container')
 
 .container
