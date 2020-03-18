@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  rocksteady:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      RAILS_ENV: development
+      RACK_ENV: development
+      RAILS_SERVE_STATIC_FILES: 'true'
+      RAILS_LOG_TO_STDOUT: 'true'
+      PORT: 3000
+      RAILS_MAX_THREADS: 2
+      DATABASE_URL: postgres://postgres:postgres@postgres/rocksteady-development
+      NOMAD_API_URI: 'http://nomad:4646/'
+    links:
+      - postgres
+      - nomad
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+
+  postgres:
+    image: postgres:12.2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  nomad:
+    build:
+      context: ./docker-dev/nomad
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  db_data:
