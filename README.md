@@ -21,8 +21,17 @@ rails db:create db:schema:load
 rails s
 ```
 
-[RockSteady is also available as a Docker image](https://hub.docker.com/r/powerrhino/rocksteady/), and is capable of self-hosting if a Nomad cluster is available.
+Alternatively, using docker-compose:
 
+```
+docker-compose build && docker-compose up
+```
+
+The command will start Rocksteady, Postgres and a Nomad agent. The project directory
+is mounted in the container, so you'll be able to make live changes.
+Adding/removing gems or npm packages requires a `docker-compose build`.
+
+[RockSteady is also available as a Docker image](https://hub.docker.com/r/powerrhino/rocksteady/), and is capable of self-hosting if a Nomad cluster is available.
 
 ## Configuration
 

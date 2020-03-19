@@ -1,0 +1,16 @@
+FROM ruby:2.5.7-alpine
+WORKDIR /app
+
+RUN apk add --update build-base tzdata postgresql-dev libcurl nodejs yarn \
+  postgresql-client libpq
+RUN gem install -f bundler:'~>2.1'
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+COPY package.json yarn.lock ./
+RUN yarn install
+
+# project directories should be mounted
+
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
