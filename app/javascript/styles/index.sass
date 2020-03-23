@@ -95,9 +95,21 @@ h5
   .badge
     display: inline
     margin-left: 1rem
+  display: flex
+  align-items: stretch
+
+  .app-title-container
+    flex: 2 auto
+  .AllocationStatus-container
+    flex: 0 0 auto
+    width: 250px
+    height: 80px
 
 // Components
 ////////////////////////////////////////////////////////////////////////////////
+
+.DeployedImage
+  font-size: smaller
 
 .ImageList
   h4
@@ -141,8 +153,13 @@ h5
 .NomadStatus
   dt
     padding-top: 0.5rem
+
+.AllocationStatus
   .instances
     padding-top: 0.5rem
+  .instance
+    display: inline-block
+    width: 45%
   .swatch
     display: inline-block
     width: 1rem
