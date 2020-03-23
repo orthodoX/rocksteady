@@ -5,6 +5,7 @@ class AppsController < ApplicationController
 
   def show
     @app = current_app
+    render :deploy
   end
 
   def edit
@@ -15,8 +16,9 @@ class AppsController < ApplicationController
     @app = current_app
   end
 
-  def deploy
+  def overview
     @app = current_app
+    render :overview
   end
 
   def nomad
