@@ -1,11 +1,18 @@
 import Moment from 'moment';
 import React from 'react';
+import _ from 'lodash';
 
 import fetch from 'util/fetch';
 import Image from './Image';
 
+import {
+  extractDeployedImage,
+  fetchNomadStatus
+} from 'components/NomadStatus/Data';
+
 interface ImageListProps {
   endpoint: string;
+  nomadStatusEndpoint: string;
   repositoryName: string;
   onSelect: (image: Image) => void;
   selectedImage?: Image;
@@ -15,6 +22,7 @@ interface ImageListState {
   loading: boolean;
   error: boolean;
   images: Image[];
+  currentImageTag: string;
 }
 
 export default class ImageList extends React.Component<ImageListProps, ImageListState> {
@@ -23,6 +31,7 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
     error: false,
     images: [],
     loading: true,
+    currentImageTag: ''
   };
 
   public componentDidMount() {
@@ -68,9 +77,11 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
     return this.state.images.map((image) => {
       const isActive = !!(this.props.selectedImage && this.props.selectedImage.id === image.id);
       const className = `list-group-item flex-column align-items-start ${ isActive ? 'active' : 'not-active'}`;
+      const isDeployed = _.includes(image.tags, this.state.currentImageTag);
 
       return (
         <div className={ className } key={ image.id } onClick={ () => this.props.onSelect(image) }>
+          { isDeployed ? <div className="mb-2"><span className="badge badge-success">currently deployed</span></div> : null }
           <div className='d-flex w-100 justify-content-between align-items-start mb-2'>
             <span className='tags d-flex flex-wrap'>{ this.taggify(image.tags, isActive) }</span>
             <small>{ image.timestamp.locale('en-gb').calendar() }</small>
@@ -89,13 +100,24 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
 
   private async fetchData() {
     try {
-      const data = await fetch(this.props.endpoint);
-      const json = await data.json();
-      const images = json.map((d: { [s: string]: any }) => new Image(d));
+      const images = await this.fetchImageList();
+      const currentImageTag = await this.fetchDeployedImageTag();
 
-      this.setState({ loading: false, images });
+      this.setState({ loading: false, images, currentImageTag });
     } catch (_) {
       this.setState({ error: true, loading: false });
     }
+  }
+
+  private async fetchImageList() {
+    const data = await fetch(this.props.endpoint);
+    const json = await data.json();
+    return json.map((d: { [s: string]: any }) => new Image(d));
+  }
+
+  private async fetchDeployedImageTag() {
+    const nomadStatus = await fetchNomadStatus(this.props.nomadStatusEndpoint);
+    const currentImage = extractDeployedImage(nomadStatus) || '';
+    return _.last(currentImage.split(':')) || '';
   }
 }

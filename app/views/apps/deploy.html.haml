@@ -2,4 +2,4 @@
 
 .container
   .tab-content
-    = react_component('ImageSelector', imageListEndpoint: api_app_images_path(@app), deployEndpoint: api_app_deploy_path(@app), repositoryName: @app.repository_name)
+    = react_component('ImageSelector', imageListEndpoint: api_app_images_path(@app), deployEndpoint: api_app_deploy_path(@app), repositoryName: @app.repository_name, nomadStatusEndpoint: api_app_nomad_status_path(@app))

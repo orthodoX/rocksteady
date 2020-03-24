@@ -9,6 +9,7 @@ import ImageList from './ImageList';
 interface ImageSelectorProps {
   deployEndpoint: string;
   imageListEndpoint: string;
+  nomadStatusEndpoint: string;
   repositoryName: string;
 }
 
@@ -28,6 +29,7 @@ class ImageSelector extends React.Component<ImageSelectorProps, ImageSelectorSta
           <div className='col'>
             <ImageList
               endpoint={ this.props.imageListEndpoint }
+              nomadStatusEndpoint={ this.props.nomadStatusEndpoint }
               repositoryName={ this.props.repositoryName }
               selectedImage={ this.state.selectedImage }
               onSelect={ this.onSelectImage }

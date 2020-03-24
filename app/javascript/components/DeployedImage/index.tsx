@@ -5,7 +5,10 @@ import React from 'react';
 
 import fetch from 'util/fetch';
 
-import NomadStatusData from 'components/NomadStatus/Data';
+import NomadStatusData, {
+  extractDeployedImage,
+  fetchNomadStatus
+} from 'components/NomadStatus/Data';
 
 interface State {
   loading: boolean;
@@ -41,16 +44,14 @@ class DeployedImage extends React.Component<Props, State> {
       return 'nothing';
     }
 
-    return this.state.data.detail.groups[0].tasks[0].config.image;
+    return extractDeployedImage(this.state.data);
   }
 
   private async fetchData() {
     try {
-      const data = await fetch(this.props.endpoint);
-      const json = await data.json();
-
-      this.setState({ data: json, loading: false });
-    } catch (_) {
+      const data = await fetchNomadStatus(this.props.endpoint);
+      this.setState({ data, loading: false });
+    } catch (e) {
       this.setState({ error: true, loading: false });
     }
   }
