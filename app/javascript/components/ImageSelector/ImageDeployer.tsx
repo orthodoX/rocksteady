@@ -7,6 +7,10 @@ import Image from './Image';
 interface ImageDeployerProps {
   endpoint: string;
   selectedImage?: Image;
+  deployButtonProps: {
+    html_classes: string[],
+    label: string
+  };
 }
 
 interface ImageDeployerState {
@@ -44,9 +48,11 @@ export default class ImageDeployer extends React.Component<ImageDeployerProps, I
   }
 
   private get deployImage() {
+    const { deployButtonProps: { html_classes, label } } = this.props;
+    const htmlClasses = `btn btn-lg btn-block ${html_classes.join(' ')}`
     return (
       <div className='ImageDeployer-deployImage'>
-        <a href='#' onClick={ this.onDeploy } className='btn btn-lg btn-success btn-block'>Deploy selected image</a>
+        <a href='#' onClick={ this.onDeploy } className={htmlClasses}>{ label }</a>
       </div>
     );
   }

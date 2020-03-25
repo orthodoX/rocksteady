@@ -11,6 +11,10 @@ interface ImageSelectorProps {
   imageListEndpoint: string;
   nomadStatusEndpoint: string;
   repositoryName: string;
+  deployButtonProps: {
+    html_classes: string[],
+    label: string
+  };
 }
 
 interface ImageSelectorState {
@@ -39,6 +43,7 @@ class ImageSelector extends React.Component<ImageSelectorProps, ImageSelectorSta
             <ImageDeployer
               endpoint={ this.props.deployEndpoint }
               selectedImage={ this.state.selectedImage }
+              deployButtonProps={ this.props.deployButtonProps }
             />
           </div>
         </div>
