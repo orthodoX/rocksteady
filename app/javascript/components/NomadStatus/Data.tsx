@@ -10,8 +10,9 @@ interface NomadStatusData {
   };
 }
 
-function extractDeployedImage(data: NomadStatusData): string|null {
-  const firstGroup = data.detail.groups[0];
+function extractDeployedImage(data: any): string|null {
+  if (!data.detail) return null;
+  const firstGroup = (data.detail.groups || [])[0];
   if (firstGroup) {
     const firstTask = firstGroup.tasks[0];
     if (firstTask) return firstTask.config.image;
@@ -19,7 +20,7 @@ function extractDeployedImage(data: NomadStatusData): string|null {
   return null;
 }
 
-async function fetchNomadStatus(nomadStatusEndpoint: string): Promise<NomadStatusData> {
+async function fetchNomadStatus(nomadStatusEndpoint: string) {
   const response = await fetch(nomadStatusEndpoint);
   return await response.json();
 }

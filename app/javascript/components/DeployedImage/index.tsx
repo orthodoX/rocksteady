@@ -51,7 +51,7 @@ class DeployedImage extends React.Component<Props, State> {
     try {
       const data = await fetchNomadStatus(this.props.endpoint);
       this.setState({ data, loading: false });
-    } catch (e) {
+    } catch (_) {
       this.setState({ error: true, loading: false });
     }
   }
