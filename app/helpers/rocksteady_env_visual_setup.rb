@@ -3,7 +3,7 @@
 module RocksteadyEnvVisualSetup
   def self.included(base)
     case ENV['ROCKSTEADY_ENV']
-    when 'live' then base.include(LiveSetup)
+    when 'production' then base.include(ProductionSetup)
     when 'staging' then base.include(StagingSetup)
     end
   end
@@ -28,7 +28,7 @@ module RocksteadyEnvVisualSetup
     { html_classes: deploy_button_html_classes, label: deploy_button_label }
   end
 
-  module LiveSetup
+  module ProductionSetup
     def application_name
       'Rocksteady (PRODUCTION)'
     end
