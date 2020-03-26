@@ -5,20 +5,12 @@ require 'rails_helper'
 RSpec.describe RocksteadyTheme do
   let(:theme_class) { described_class::ThemeConfig }
 
-  let(:theme) { described_class.parse_config(theme_options.to_json) }
-  let(:theme_options) { {} }
-
-  describe 'parse_config' do
-    context 'with invalid JSON' do
-      it 'returns the default ThemeConfig' do
-        expect(described_class.parse_config('')).to be_a(theme_class)
-      end
-    end
-  end
+  let(:theme) { theme_class.new(*theme_options) }
+  let(:theme_options) { [] }
 
   describe 'application_name' do
     context 'with custom config' do
-      let(:theme_options) { { label: 'some label' } }
+      let(:theme_options) { ['some label'] }
 
       it 'is Rocksteady (some label)' do
         expect(theme.application_name).to eq('Rocksteady (some label)')
@@ -34,7 +26,7 @@ RSpec.describe RocksteadyTheme do
 
   describe 'header_html_classes' do
     context 'with warning config' do
-      let(:theme_options) { { colour_theme: 'warning' } }
+      let(:theme_options) { [nil, 'warning'] }
 
       it 'includes primary background' do
         expect(theme.header_html_classes).to eq(%w(navbar-dark bg-primary))
@@ -50,7 +42,7 @@ RSpec.describe RocksteadyTheme do
 
   describe 'deploy_button_html_classes' do
     context 'with warning config' do
-      let(:theme_options) { { colour_theme: 'warning' } }
+      let(:theme_options) { [nil, 'warning'] }
 
       it 'is a warning button' do
         expect(theme.deploy_button_html_classes).to eq(%w(btn-warning))
@@ -66,7 +58,7 @@ RSpec.describe RocksteadyTheme do
 
   describe 'deploy_button_label' do
     context 'with custom config' do
-      let(:theme_options) { { label: 'QA' } }
+      let(:theme_options) { ['QA'] }
 
       it 'includes the custom label' do
         expect(theme.deploy_button_label).to eq('Deploy selected image to QA')

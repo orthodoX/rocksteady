@@ -42,9 +42,9 @@ Rocksteady is configured using the following environment variables:
 - `SECRET_KEY_BASE` – Secret key for Rails sessions.
 - `NOMAD_API_URI` – HTTP(S) endpoint to a server for the Nomad cluster being used.
 - `ECR_BASE` – Base URI for ECR repositories (not including the repository name).
-- `ROCKSTEADY_THEME` – (optional) you can provide a JSON object like `{ "label": "staging", "colour_theme": "warning" }`, where `colour_theme` can be either `normal` or `warning`.
-  The different values trigger some cosmetic changes in the UI to make the user
-  aware of the different environment.
+- `ROCKSTEADY_THEME_LABEL` - (optional) a custom label to be placed next to the application name.
+- `ROCKSTEADY_THEME_COLOUR` - (optional) when set to `warning` triggers some colour
+  changes in the UI to make the user aware of a possibly sensitive environment.
 
 AWS configuration is supplied using the standard AWS configuration methods. You can specify this using an explicit key pair and region:
 
