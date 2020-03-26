@@ -17,10 +17,10 @@
 .container
   %ul.nav.nav-tabs
     %li.nav-item
-      %a.nav-link{ href: app_path(@app), class: (:active if controller.action_name == 'show') } Overview
+      %a.nav-link{ href: app_path(@app), class: (:active if controller.action_name == 'show') } Deploy
+    %li.nav-item
+      %a.nav-link{ href: details_app_path(@app), class: (:active if controller.action_name == 'details') } Details
     %li.nav-item
       %a.nav-link{ href: job_spec_app_path(@app), class: (:active if controller.action_name == 'job_spec') } Job spec
-    %li.nav-item
-      %a.nav-link{ href: deploy_app_path(@app), class: (:active if controller.action_name == 'deploy') } Deploy
     %li.nav-item
       %a.nav-link{ href: edit_app_path(@app), class: (:active if controller.action_name == 'edit' || controller.action_name == 'update' ) } Edit settings
