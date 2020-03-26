@@ -7,7 +7,7 @@ Rails.application.routes.draw do
     member do
       get 'job_spec'
       get 'nomad'
-      get 'overview'
+      get 'details'
     end
   end
 

@@ -16,9 +16,9 @@ class AppsController < ApplicationController
     @app = current_app
   end
 
-  def overview
+  def details
     @app = current_app
-    render :overview
+    render :details
   end
 
   def nomad
