@@ -3,8 +3,6 @@ import { hot } from 'react-hot-loader';
 import _ from 'lodash';
 import React from 'react';
 
-import fetch from 'util/fetch';
-
 import NomadStatusData, {
   extractDeployedImage,
   fetchNomadStatus
