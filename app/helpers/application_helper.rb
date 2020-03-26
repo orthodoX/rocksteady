@@ -1,3 +1,3 @@
 module ApplicationHelper
-  include RocksteadyEnvVisualSetup
+  include RocksteadyTheme
 end
