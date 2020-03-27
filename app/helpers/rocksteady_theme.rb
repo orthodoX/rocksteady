@@ -32,16 +32,12 @@ module RocksteadyTheme
 
   class << self
     attr_reader :theme_config
-
-    def parse_config(value)
-      conf = JSON.parse(value).with_indifferent_access
-      ThemeConfig.new(conf[:label], conf[:colour_theme])
-    rescue JSON::ParserError
-      ThemeConfig.new
-    end
   end
 
-  @theme_config = parse_config(ENV['ROCKSTEADY_THEME'] || '')
+  @theme_config = ThemeConfig.new(
+    ENV['ROCKSTEADY_THEME_LABEL'],
+    ENV['ROCKSTEADY_THEME_COLOUR']
+  )
 
   def deploy_button_props
     { html_classes: deploy_button_html_classes, label: deploy_button_label }
