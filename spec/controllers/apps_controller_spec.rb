@@ -99,6 +99,74 @@ RSpec.describe AppsController, type: :controller do
 
         expect(response.status).to eq(400)
       end
+
+      context 'when Graylog stream integration is enabled' do
+        before do
+          stub_const('ENV', ENV.to_hash.merge('GRAYLOG_ENABLED' => 'true') )
+        end
+
+        it 'returns HTTP status OK (200) when the app is created with a Graylog stream' do
+          payload_with_stream = payload.dup
+          payload_with_stream[:app][:add_graylog_stream] = '1'
+
+          result_stub = { stream_id: '123', index_set_id: '456' }
+
+          stream_config_instance = instance_double(GraylogAPI::StreamConfig)
+          allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
+          allow(stream_config_instance).to receive(:setup).and_return(result_stub)
+
+          post :create, params: payload_with_stream, as: :json
+
+          expect(response.status).to eq(200)
+        end
+
+        it 'returns HTTP status OK (200) when the app is updated with a Graylog stream' do
+          stream = GraylogStream.new(id: '123', name: 'testapp', rule_value: 'test', index_set_id: '1')
+          app = App.create(payload[:app].merge(graylog_stream: stream))
+
+          payload_with_stream = payload.dup
+          payload_with_stream[:app][:update_graylog_stream] = '1'
+
+          result_stub = { index_set_id: '456' }
+
+          stream_config_instance = instance_double(GraylogAPI::StreamConfig)
+          allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
+          allow(stream_config_instance).to receive(:update).and_return(result_stub)
+
+          put :update, params: { app: payload_with_stream[:app], id: app.name } , as: :json
+
+          expect(response.status).to eq(200)
+        end
+
+        it 'returns HTTP status OK (200) when the app is deleted with a Graylog stream' do
+          stream = GraylogStream.new(id: '123', name: 'testapp', rule_value: 'test', index_set_id: '1')
+          app = App.create(payload[:app].merge(graylog_stream: stream))
+
+          result_stub = OpenStruct.new(successful?: true)
+          stub_request(:delete, /localhost/)
+
+          stream_config_instance = instance_double(GraylogAPI::StreamConfig)
+          allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
+          allow(stream_config_instance).to receive(:delete).and_return(result_stub)
+
+          delete :destroy, params: { id: app.name } , as: :json
+
+          expect(response.status).to eq(200)
+        end
+
+        it 'returns HTTP status Bad Request (400) when a Graylog operation cannot be completed' do
+          payload_with_stream = payload.dup
+          payload_with_stream[:app][:add_graylog_stream] = '1'
+
+          stream_config_instance = instance_double(GraylogAPI::StreamConfig)
+          allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
+          allow(stream_config_instance).to receive(:setup)
+
+          post :create, params: payload_with_stream, as: :json
+
+          expect(response.status).to eq(400)
+        end
+      end
     end
   end
 end
