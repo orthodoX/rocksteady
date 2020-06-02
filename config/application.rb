@@ -19,7 +19,7 @@ Bundler.require(*Rails.groups)
 module RockSteady
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.1
+    config.load_defaults 5.2
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
@@ -31,7 +31,7 @@ module RockSteady
     # Use default logging formatter so that PID and timestamp are not suppressed.
     config.log_formatter = ::Logger::Formatter.new
 
-    if ENV["RAILS_LOG_TO_STDOUT"].present?
+    if ENV['RAILS_LOG_TO_STDOUT'].present?
       logger           = ActiveSupport::Logger.new(STDOUT)
       logger.formatter = config.log_formatter
       config.logger    = ActiveSupport::TaggedLogging.new(logger)
