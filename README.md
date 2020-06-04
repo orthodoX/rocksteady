@@ -45,6 +45,7 @@ Rocksteady is configured using the following environment variables:
 - `ROCKSTEADY_THEME_LABEL` - (optional) a custom label to be placed next to the application name.
 - `ROCKSTEADY_THEME_COLOUR` - (optional) when set to `warning` triggers some colour
   changes in the UI to make the user aware of a possibly sensitive environment.
+- `GRAYLOG_ENABLED` - (optional) when set to `true` enables the UI integration with Graylog
 
 AWS configuration is supplied using the standard AWS configuration methods. You can specify this using an explicit key pair and region:
 
@@ -55,6 +56,43 @@ AWS configuration is supplied using the standard AWS configuration methods. You 
 Alternatively, if you have an appropriate profile in place:
 
 - `AWS_PROFILE` – Locally-configured AWS profile supplying an AWS keypair and region.
+
+### Graylog Integration
+
+**note** The integration is fairly opinionated and tailored to specific needs. There are many possible customisations that might improve its flexibility.
+PRs are welcome and encouraged.
+
+In order to communicate with Graylog some ENV variables have to be set (in addition to `GRAYLOG_ENABLED`):
+
+- `GRAYLOG_API_URI` - Used by the client to access the API
+- `GRAYLOG_API_USER` - Corresponding API user
+- `GRAYLOG_API_PASSWORD` - Corresponding API password
+
+When making requests using the Rocksteady API, the integration is based off these 2 parameters:
+- `:add_graylog_stream`, IN [`'1','0'`] (Used to create a stream on a new app or to add a stream to an App already created without one)
+- `:update_graylog_stream`, IN [`'1','0'`] (Used to update a stream associated with an App)
+
+When adding a new Stream, some assumptions are made:
+- The `name` of the stream is set using the `name` of the app
+- The `rule_value` of the stream is set using the `name` of the app. This will 'match exactly the value on the field tag'. See [streams and rules](https://docs.graylog.org/en/3.2/pages/streams.html#streams)
+- The `index_set_id` is returned by the API and is based on the `repository_name` of the app. If the preferred `index_set` is not found the Default one is used instead.
+
+#### Role
+
+When creating a stream, a read only permission is granted to the `Dev` role by default.
+
+#### Basic behaviour
+
+- An App cannot be created if creating the stream fails
+- An App can be updated if updating the stream fails but an alert is displayed
+- An App can be deleted if the stream cannot be deleted but an alert is displayed
+
+#### Adding the integration to an existing set of Apps
+
+A rake task to associate apps to existing streams is available and can be run with:
+`bundle exec rake graylog:integration:sync`
+
+The task is idempotent and uses the rules above for `stream_name` and `rule_value`.
 
 ## Bootstrapping
 
