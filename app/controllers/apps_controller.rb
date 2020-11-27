@@ -18,6 +18,11 @@ class AppsController < ApplicationController
   end
 
   def show
+    @default_filters = {
+      filter_master: ENV.fetch('DEFAULT_FILTER_MASTER', 'false') == 'true',
+      filter_latest: ENV.fetch('DEFAULT_FILTER_LATEST', 'false') == 'true'
+    }
+
     render :deploy
   end
 

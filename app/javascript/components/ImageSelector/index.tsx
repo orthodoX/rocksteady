@@ -15,6 +15,10 @@ interface ImageSelectorProps {
     html_classes: string[],
     label: string
   };
+  defaultFilters: {
+    filter_master: boolean,
+    filter_latest: boolean
+  }
 }
 
 interface ImageSelectorState {
@@ -37,6 +41,8 @@ class ImageSelector extends React.Component<ImageSelectorProps, ImageSelectorSta
               repositoryName={ this.props.repositoryName }
               selectedImage={ this.state.selectedImage }
               onSelect={ this.onSelectImage }
+              isMasterOnlyDefault={ this.props.defaultFilters.filter_master }
+              isLatestOnlyDefault={ this.props.defaultFilters.filter_latest }
             />
           </div>
           <div className='col'>
