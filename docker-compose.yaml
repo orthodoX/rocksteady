@@ -37,6 +37,8 @@ services:
       context: ./docker-dev/nomad
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 4646:4646
 
 volumes:
   db_data:
