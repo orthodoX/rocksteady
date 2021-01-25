@@ -16,7 +16,7 @@ interface ImageSelectorProps {
     label: string
   };
   defaultFilters: {
-    filter_master: boolean,
+    filter_main: boolean,
     filter_latest: boolean
   }
 }
@@ -41,7 +41,7 @@ class ImageSelector extends React.Component<ImageSelectorProps, ImageSelectorSta
               repositoryName={ this.props.repositoryName }
               selectedImage={ this.state.selectedImage }
               onSelect={ this.onSelectImage }
-              isMasterOnlyDefault={ this.props.defaultFilters.filter_master }
+              isMainOnlyDefault={ this.props.defaultFilters.filter_main }
               isLatestOnlyDefault={ this.props.defaultFilters.filter_latest }
             />
           </div>

@@ -16,7 +16,7 @@ interface ImageListProps {
   repositoryName: string;
   onSelect: (image: Image) => void;
   selectedImage?: Image;
-  isMasterOnlyDefault: boolean;
+  isMainOnlyDefault: boolean;
   isLatestOnlyDefault: boolean;
 }
 
@@ -26,7 +26,7 @@ interface ImageListState {
   images: Image[];
   displayedImages: Image[];
   currentImageTag: string;
-  isMasterOnly: boolean;
+  isMainOnly: boolean;
   isLatestOnly: boolean;
 }
 
@@ -38,7 +38,7 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
     displayedImages: [],
     loading: true,
     currentImageTag: '',
-    isMasterOnly: this.props.isMasterOnlyDefault,
+    isMainOnly: this.props.isMainOnlyDefault,
     isLatestOnly: this.props.isLatestOnlyDefault
   };
 
@@ -66,13 +66,13 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
       <div className='form-group'>
         <div className='form-check form-check-inline'>
           <input
-            id='isMasterOnly'
-            name='isMasterOnly'
+            id='isMainOnly'
+            name='isMainOnly'
             type='checkbox'
             className='form-check-input'
-            checked={this.state.isMasterOnly}
+            checked={this.state.isMainOnly}
             onChange={this.handleFiltersChanged} />
-          <label htmlFor='isMasterOnly' className='form-check-label'>Show master/main only</label>
+          <label htmlFor='isMainOnly' className='form-check-label'>Show main/master only</label>
         </div>
         <div className='form-check form-check-inline'>
           <input
@@ -162,7 +162,7 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
     return json.map((d: { [s: string]: any }) => new Image(d));
   }
 
-  private imageMasterFilter(image) {
+  private imageMainFilter(image) {
     return image.tags.some((tag) =>
       /^(master|main)/.test(tag)
     );
@@ -176,8 +176,8 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
 
   private filterImages(images) {
     let filteredImages = images;
-    if (this.state.isMasterOnly) {
-      filteredImages = filteredImages.filter(this.imageMasterFilter);
+    if (this.state.isMainOnly) {
+      filteredImages = filteredImages.filter(this.imageMainFilter);
     }
     if (this.state.isLatestOnly) {
       filteredImages = filteredImages.filter(this.imageLatestFilter);

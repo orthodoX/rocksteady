@@ -19,7 +19,7 @@ class AppsController < ApplicationController
 
   def show
     @default_filters = {
-      filter_master: ENV.fetch('DEFAULT_FILTER_MASTER', 'false') == 'true',
+      filter_main: ENV.fetch('DEFAULT_FILTER_MAIN', 'false') == 'true',
       filter_latest: ENV.fetch('DEFAULT_FILTER_LATEST', 'false') == 'true'
     }
 

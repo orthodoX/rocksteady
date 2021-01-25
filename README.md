@@ -45,7 +45,7 @@ Rocksteady is configured using the following environment variables:
 - `ROCKSTEADY_THEME_LABEL` - (optional) a custom label to be placed next to the application name.
 - `ROCKSTEADY_THEME_COLOUR` - (optional) when set to `warning` triggers some colour
   changes in the UI to make the user aware of a possibly sensitive environment.
-- `DEFAULT_FILTER_MASTER` - (optional) when set to `true` selects the checkbox to show only the master branch in the deploy page
+- `DEFAULT_FILTER_MAIN` - (optional) when set to `true` selects the checkbox to show only the main/master branch in the deploy page
 - `DEFAULT_FILTER_LATEST` - (optional) when set to `true` selects the checkbox to show only the latest branch in the deploy page
 
 AWS configuration is supplied using the standard AWS configuration methods. You can specify this using an explicit key pair and region:
