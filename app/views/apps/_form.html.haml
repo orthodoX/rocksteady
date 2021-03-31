@@ -24,19 +24,15 @@
 
     %small.form-text.text-muted Select whether images will be sourced from Docker Hub or a private ECR repository.
 
-  - if ENV['GRAYLOG_ENABLED'].present? && @app.graylog_stream.blank?
-    .form-group.form-check
-      = f.check_box :add_graylog_stream, checked: false, class: 'form-check-input'
-      = f.label :graylog, "Add stream to Graylog"
-      %small.form-text.text-muted Add a stream to Graylog with permission to read enabled for the Dev usergroup.
-      = link_to '(?) click here for more information', 'https://github.com/PowerRhino/rocksteady/blob/master/README.md#Graylog%20Integration', class: 'small form-text text-muted'
 
-  - if ENV['GRAYLOG_ENABLED'].present? && @app.graylog_stream.present?
+  - if ENV['GRAYLOG_ENABLED'].present?
     .form-group.form-check
-      = f.check_box :graylog_stream, checked: true, disabled: true, class: 'form-check-input'
-      = f.hidden_field :update_graylog_stream, value: '1'
-      = f.label :graylog, "A Graylog stream is associated with this app", class: "form-text form-muted"
-      %small.form-text.text-muted Updating the 'Repository name' field will update the associated index_set_id.
+      = f.check_box :add_graylog_stream, class: 'form-check-input', checked: @app.graylog_stream.present?, disabled: @app.graylog_stream.present?
+      = f.label :add_graylog_stream, "With Graylog stream"
+      - if @app.graylog_stream.present?
+        = f.hidden_field :update_graylog_stream, value: '1'
+      %small.form-text.text-muted Tick for an app with an associated Graylog stream. Updating the 'Repository name' field will update the index that the stream belongs to.
+
 
   .form-group.required
     = f.label :repository_name, "Repository name"

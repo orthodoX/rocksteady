@@ -1,36 +1,31 @@
 class AppsController < ApplicationController
+  before_action :set_app, except: %i[new create index]
+
+  def set_app
+    @app = App.find_by!(name: params[:id])
+  end
+
   def index
     respond_to do |format|
       format.html do
-        @repos = App.all.group_by(&:repository_name).sort_by { |repo_name, _| repo_name }
+        @repos = AppIndex.new.repos_html
       end
+
       format.json do
-        render status: :ok, json: App.all
+        render status: :ok, json: AppIndex.new.repos_json
       end
     end
   end
 
   def show
-    @app = current_app
     render :deploy
   end
 
-  def edit
-    @app = current_app
-  end
+  def job_spec; end
 
-  def job_spec
-    @app = current_app
-  end
+  def details; end
 
-  def details
-    @app = current_app
-    render :details
-  end
-
-  def nomad
-    @app = current_app
-  end
+  def nomad; end
 
   def new
     @app = App.new
@@ -38,70 +33,75 @@ class AppsController < ApplicationController
 
   def create
     @app = AppCreation.new(app_params: app_params, add_stream: add_stream?).create
+    result = @app.save
 
     respond_to do |format|
       format.html do
-        if @app.save
+        if result
           flash[:notice] = 'App has been created'
           redirect_to app_path(@app)
         else
           render action: :new
         end
       end
+
       format.json do
-        if @app.save
-          render status: :ok, json: @app
+        if result
+          render status: :ok, json: { app: @app }
         else
-          render status: :bad_request, json: @app.errors
+          render status: :bad_request, json: { error: @app.errors }
         end
       end
     end
   end
 
+  def edit; end
+
   def update
-    @app = current_app
-    output = AppUpdate.new(@app, add_stream: add_stream?, update_stream: update_stream?).update(app_params)
+    result = AppUpdate.new(@app, add_stream: add_stream?, update_stream: update_stream?).update(app_params)
 
     respond_to do |format|
       format.html do
-        if output[:updated]
+        if result[:updated]
           flash[:notice] = 'App has been updated. You will need to deploy again for any changes to take effect.'
-          flash[:warning] = output[:warning] if output[:warning]
+          flash[:warning] = result[:warning] if result[:warning]
           redirect_to app_path(@app)
         else
           render action: :edit
         end
       end
+
       format.json do
-        if output[:updated]
-          render status: :ok, json: output[:warning]? { warning: output[:warning], app: @app } : @app
+        if result[:updated]
+          render status: :ok, json: result[:warning] ? { warning: result[:warning], app: @app } : { app: @app }
         else
-          render status: :bad_request, json: "Warning: #{@app.name} could not be updated"
+          render status: :bad_request, json: { error: "Error: #{@app.name} could not be updated" }
         end
       end
     end
   end
 
   def destroy
-    @app = current_app
-    output = AppDeletion.new(@app).delete!
+    result = AppDeletion.new(@app).delete!
 
     respond_to do |format|
       format.html do
-        if output[:deleted] && @app&.destroy
+        if result[:deleted] && @app&.destroy
           flash[:notice] = 'App has been removed from Nomad and deleted'
-          flash[:warning] =  output[:warning] if output[:warning]
+          flash[:warning] = result[:warning] if result[:warning]
           redirect_to action: :index
         else
           flash[:error] = 'Could not delete app'
+          @repos = AppIndex.new.repos_html
           render action: :index
         end
       end
+
       format.json do
-        if output[:deleted] && @app&.destroy
-          render status: :ok, json: output[:warning] ? { warning: output[:warning], app: 'App deleted' } : 'App Deleted'
+        if result[:deleted] && @app&.destroy
+          render status: :ok, json: result[:warning] ? { warning: result[:warning], app: 'App deleted' } : { app: 'App deleted' }
         else
-          render status: :bad_request, json: "Warning: App could not be deleted"
+          render status: :bad_request, json: { error: 'Error: App could not be deleted' }
         end
       end
     end
@@ -126,10 +126,6 @@ class AppsController < ApplicationController
       :add_graylog_stream,
       :update_graylog_stream
     )
-  end
-
-  def current_app
-    App.find_by(name: params[:id])
   end
 
   def add_stream?
