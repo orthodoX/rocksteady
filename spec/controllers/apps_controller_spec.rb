@@ -113,7 +113,7 @@ RSpec.describe AppsController, type: :controller do
 
           stream_config_instance = instance_double(GraylogAPI::StreamConfig)
           allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
-          allow(stream_config_instance).to receive(:setup).and_return(result_stub)
+          allow(stream_config_instance).to receive(:create).and_return(result_stub)
 
           post :create, params: payload_with_stream, as: :json
 
@@ -160,7 +160,7 @@ RSpec.describe AppsController, type: :controller do
 
           stream_config_instance = instance_double(GraylogAPI::StreamConfig)
           allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
-          allow(stream_config_instance).to receive(:setup)
+          allow(stream_config_instance).to receive(:create)
 
           post :create, params: payload_with_stream, as: :json
 

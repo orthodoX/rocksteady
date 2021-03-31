@@ -2,62 +2,50 @@ module GraylogAPI
   class StreamConfig
     ROLE = 'Dev'.freeze
 
-    attr_reader :app
-    private :app
+    attr_reader :app, :client
+    private :app, :client
 
-    def initialize(app)
+    def initialize(app, client = Client.new)
       @app = app
+      @client = client
     end
 
-    def setup
-      stream = Stream.new(options, client)
-
-      return unless stream.create.successful?
+    def create
+      stream = build_stream
+      return {} unless stream.create.successful?
 
       stream.start
-      return unless role.update(stream.id).successful?
+      return {} unless role.update(stream.id).successful?
 
       {
         stream_id: stream.id,
-        index_set_id: index_set_id
+        index_set_id: stream.index_set_id
       }
     end
 
     def update(stream_id)
-      stream = Stream.new(options.merge(stream_id: stream_id), client)
+      stream = build_stream(stream_id: stream_id)
+      return {} unless stream.update.successful?
 
-      return unless stream.update.successful?
-
-      {
-        index_set_id: index_set_id
-      }
+      { index_set_id: stream.index_set_id }
     end
 
     def delete(stream_id)
-      stream = Stream.new(options.merge(stream_id: stream_id), client)
+      stream = build_stream(stream_id: stream_id)
       stream.delete
-    end
-
-    def index_set_id
-      @index_set ||= IndexSet.new(index_set, client).id
-    end
-
-    def role
-      @role ||= Role.new(ROLE, client)
-    end
-
-    def client
-      @client ||= Client.new
     end
 
     private
 
-    def index_set
-      app.repository_name
+    def build_stream(options = {})
+      index_set_id = IndexSet.new(app.repository_name, client).id
+      options = { title: app.name, index_set_id: index_set_id }.merge(options)
+
+      Stream.new(options, client)
     end
 
-    def options
-      { title: app.name, index_set_id: index_set_id }
+    def role
+      @role ||= Role.new(ROLE, client)
     end
   end
 end

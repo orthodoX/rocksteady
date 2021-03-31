@@ -1,133 +1,190 @@
 require 'rails_helper'
 
 RSpec.describe GraylogAPI::StreamConfig do
-  subject(:stream_config) { described_class.new(app) }
+  subject(:stream_config) do
+    app = App.create!(repository_name: 'repo-name', name: 'app-name', job_spec: 'job spec')
+    described_class.new(app)
+  end
 
-  let(:app) { instance_double('App', { repository_name: 'test', name: 'app name'}) }
-  let(:index_sets) {
-    {
-      index_sets: [
-        {'id' => '123', 'index_prefix' => 'graylog'}
-      ]
-    }
-  }
-  let(:headers) { {'Content-Type' => 'application/json'} }
+  let(:index_set_url) { "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::IndexSet::ENDPOINT}" }
+  let(:stream_url) { "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::Stream::ENDPOINT}" }
+  let(:role_url) { "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::Role::ENDPOINT}/#{described_class::ROLE}" }
 
-  describe '#setup' do
-    let(:stream) { {stream_id: '999'} }
-    let(:role) {
-      {
+  describe '#create' do
+    context 'when success' do
+      before do
+        index_set_stub
+        stream_creation_stub
+        stream_start_stub
+        role_update_stub
+      end
+
+      it 'returns ids' do
+        expect(stream_config.create).to eq(stream_id: '123', index_set_id: '1')
+      end
+
+      it 'creates a stream' do
+        stream_config.create
+        expect(stream_creation_stub).to have_been_requested.once
+      end
+
+      it 'starts the stream' do
+        stream_config.create
+        expect(stream_start_stub).to have_been_requested.once
+      end
+
+      it 'adds new stream to the role permissions' do
+        stream_config.create
+        expect(role_update_stub).to have_been_requested.once
+      end
+    end
+
+    context 'when failure' do
+      it 'returns no ids if index set is null' do
+        stub_request(:get, index_set_url).to_timeout
+        stub_request(:post, stream_url).to_timeout
+        expect(stream_config.create).to be_empty
+      end
+
+      it 'returns no ids if creation fails' do
+        index_set_stub
+        stub_request(:post, stream_url).to_timeout
+        expect(stream_config.create).to be_empty
+      end
+
+      it 'returns no ids if creation succeeds but role update fails' do
+        index_set_stub
+        stream_creation_stub
+        stream_start_stub
+        role_read_stub
+        stub_request(:put, role_url).to_timeout
+        expect(stream_config.create).to be_empty
+      end
+
+      it 'does not start the stream' do
+        index_set_stub
+        stub_request(:post, stream_url).to_timeout
+        stream_config.create
+        expect(stream_start_stub).to_not have_been_requested
+      end
+
+      it 'does not update role permissions' do
+        index_set_stub
+        stub_request(:post, stream_url).to_timeout
+        stream_config.create
+        expect(role_update_stub).to_not have_been_requested
+      end
+
+      it 'does not update role permissions if creation succeeds but role update fails' do
+        index_set_stub
+        stream_creation_stub
+        stream_start_stub
+        stub_request(:get, role_url).to_timeout
+        update = stub_request(:put, role_url)
+
+        stream_config.create
+
+        expect(update).to_not have_been_requested
+      end
+    end
+
+    def stream_creation_stub
+      stub_request(:post, stream_url).to_return(
+        status: 201, body: { stream_id: '123' }.to_json, headers: { 'Content-Type': 'application/json' }
+      )
+    end
+
+    def stream_start_stub
+      stub_request(:post, "#{stream_url}/123#{GraylogAPI::Stream::START_PATH}").to_return(status: 204, body: '')
+    end
+
+    def role_read_stub
+      dev_role = {
         name: 'Dev',
         description: 'Altmetric developers',
-        permissions: [
-          'streams:read:777'
-        ]
+        permissions: ['streams:read:321'],
+        read_only: false
       }
-    }
+      stub_request(:get, role_url).to_return(
+        status: 200, body: dev_role.to_json, headers: { 'Content-Type': 'application/json' }
+      )
+    end
 
-    context 'when all the requests are successful' do
+    def role_update_stub
+      dev_role = JSON.parse(role_read_stub.response.body, symbolize_names: true)
+      dev_role[:permissions] = ['streams:read:321', 'streams:read:123']
+      stub_request(:put, role_url).to_return(
+        status: 200, body: dev_role.to_json, headers: { 'Content-Type': 'application/json' }
+      )
+    end
+  end
+
+  describe '#update' do
+    context 'when success' do
       before do
-        get_index_sets_stub
-        stream_stub(verb: :post, response: stream)
-        streams_resume_stub
-        role_update_stub(response: role)
-        role_update_stub(verb: :put)
+        index_set_stub
+        stream_update_stub
       end
 
-      it 'returns a hash with the stream_id and index_set_id' do
-        expect(stream_config.setup[:stream_id]).to be_present
+      it 'updates the stream' do
+        stream_config.update('123')
+        expect(stream_update_stub).to have_been_requested.once
+      end
+
+      it 'returns the index set id' do
+        expect(stream_config.update('123')).to eq(index_set_id: '1')
+      end
+
+      def stream_update_stub
+        stub_request(:put, "#{stream_url}/123").to_return(
+          status: 201, body: { id: '123' }.to_json, headers: { 'Content-Type': 'application/json' }
+        )
       end
     end
 
-    context 'when the stream is not created successfully cause of a bad response' do
-        before do
-          get_index_sets_stub(status: 400)
-          stream_stub(verb: :post, status: 400)
-        end
-
-      it 'returns nil' do
-        expect(stream_config.setup).to_not be_present
-      end
-    end
-
-    context 'when the stream is not created successfully cause of a network error' do
-      before do
-        get_index_sets_stub
-        stub_request(:post, 'https://test.com/api/streams')
-          .to_raise(HTTP::Error)
+    context 'when failure' do
+      it 'returns no index set id' do
+        index_set_stub
+        stub_request(:put, "#{stream_url}/123").to_timeout
+        expect(stream_config.update('123')).to be_empty
       end
 
-      it 'returns nil' do
-        expect(stream_config.setup).to_not be_present
+      it 'returns no index set id if index set request fails' do
+        stub_request(:get, index_set_url).to_timeout
+        stub_request(:put, "#{stream_url}/123").to_timeout
+        expect(stream_config.update('123')).to be_empty
       end
     end
   end
 
   describe '#delete' do
-    let(:stream) { GraylogStream.new(id: '123') }
-    let(:app) { App.create(name: 'app name', repository_name: 'test', job_spec: '{}', graylog_stream: stream) }
+    context 'when success' do
+      it 'is successful' do
+        index_set_stub
+        stream_deletion_stub
+        expect(stream_config.delete('123')).to be_successful
+      end
 
-    before { get_index_sets_stub }
-
-    context 'when the request is successful' do
-      before { stream_stub(verb: :delete, id: '123') }
-
-      it 'removes the stream from the index and returns a result object' do
-        expect(described_class.new(app).delete(stream.id)).to be_successful
+      def stream_deletion_stub
+        stub_request(:delete, "#{stream_url}/123").to_return(
+          status: 204, body: '', headers: { 'Content-Type': 'application/json' }
+        )
       end
     end
 
-    context 'when the request is not successful' do
-      before { stream_stub(verb: :delete, status: 400, id: '123') }
-
-      it 'returns a response object' do
-        expect(described_class.new(app).delete(stream.id)).to_not be_successful
-      end
-    end
-  end
-
-  describe '#update' do
-    let(:stream) { GraylogStream.new(id: '123') }
-    let(:app) { App.create(name: 'app name', repository_name: 'test', job_spec: '{}', graylog_stream: stream) }
-
-    before { get_index_sets_stub }
-
-    context 'when the request is successful' do
-      before { stream_stub(verb: :put, id: '123') }
-
-      it 'updates the stream and returns the index_set_id' do
-        expect(described_class.new(app).update(stream.id)).to eq({index_set_id: '123'})
-      end
-    end
-
-    context 'when the request is not successful' do
-      before { stream_stub(verb: :put, status: 400, id: '123') }
-
-      it 'returns nil' do
-        expect(described_class.new(app).update(stream.id)).to_not be_present
+    context 'when failure' do
+      it 'is not successful' do
+        index_set_stub
+        stub_request(:delete, "#{stream_url}/123").to_timeout
+        expect(stream_config.delete('123')).to_not be_successful
       end
     end
   end
 
-  def get_index_sets_stub(status: 200)
-    stub_request(:get, 'https://test.com/api/system/indices/index_sets')
-      .to_return(status: status, body: index_sets.to_json, headers: headers)
-  end
-
-  def stream_stub(verb:, status: 200, response: '', id: nil)
-    url = id ? "https://test.com/api/streams/#{id}" : "https://test.com/api/streams"
-
-    stub_request(verb, url)
-      .to_return(status: status, body: response.to_json, headers: headers)
-  end
-
-  def streams_resume_stub
-    stub_request(:post, 'https://test.com/api/streams/999/resume')
-      .to_return(status: 200, body: ''.to_json, headers: headers)
-  end
-
-  def role_update_stub(verb: :get, status: 200, response: '')
-    stub_request(verb, 'https://test.com/api/roles/Dev')
-      .to_return(status: status, body: response.to_json, headers: headers)
+  def index_set_stub
+    body = { index_sets: [{ 'id' => '1', 'index_prefix' => 'graylog' }] }
+    stub_request(:get, index_set_url).to_return(
+      status: 200, body: body.to_json, headers: { 'Content-Type': 'application/json' }
+    )
   end
 end

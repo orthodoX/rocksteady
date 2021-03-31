@@ -16,7 +16,7 @@ class AppCreation
 
   def add_graylog_stream
     app.assign_attributes(validate_stream: true)
-    stream_info = GraylogAPI::StreamConfig.new(app).setup
+    stream_info = GraylogAPI::StreamConfig.new(app).create
     build_associated_stream(stream_info) if stream_info.present?
     app
   end

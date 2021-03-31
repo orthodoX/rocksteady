@@ -47,11 +47,11 @@ RSpec.describe AppCreation do
       let(:add_stream) { false }
 
       it 'sets up Graylog' do
-        allow(stream_config_instance).to receive(:setup)
+        allow(stream_config_instance).to receive(:create)
 
         app_creation.create
 
-        expect(stream_config_instance).to_not have_received(:setup)
+        expect(stream_config_instance).to_not have_received(:create)
       end
 
       it 'returns the app instance' do
@@ -79,7 +79,7 @@ RSpec.describe AppCreation do
         stream_config_instance = instance_double(GraylogAPI::StreamConfig)
 
         allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
-        allow(stream_config_instance).to receive(:setup).and_return(result_stub)
+        allow(stream_config_instance).to receive(:create).and_return(result_stub)
 
         app = app_creation.add_graylog_stream
 
@@ -92,7 +92,7 @@ RSpec.describe AppCreation do
         stream_config_instance = instance_double(GraylogAPI::StreamConfig)
 
         allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
-        allow(stream_config_instance).to receive(:setup)
+        allow(stream_config_instance).to receive(:create)
 
         app = app_creation.add_graylog_stream
 

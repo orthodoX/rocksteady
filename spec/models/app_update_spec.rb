@@ -93,7 +93,7 @@ RSpec.describe AppUpdate do
         stream_config_instance = instance_double(GraylogAPI::StreamConfig)
 
         allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
-        allow(stream_config_instance).to receive(:setup).and_return(result_stub)
+        allow(stream_config_instance).to receive(:create).and_return(result_stub)
         app = existing_app(stream: false)
         described_class.new(app, options).update(params)
 
@@ -116,7 +116,7 @@ RSpec.describe AppUpdate do
         stream_config_instance = instance_double(GraylogAPI::StreamConfig)
 
         allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
-        allow(stream_config_instance).to receive(:setup).and_return(result_stub)
+        allow(stream_config_instance).to receive(:create).and_return(result_stub)
         app = existing_app(stream: false)
         described_class.new(app, options).update(params)
 
