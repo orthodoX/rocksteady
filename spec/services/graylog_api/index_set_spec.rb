@@ -54,12 +54,12 @@ RSpec.describe GraylogAPI::IndexSet do
     {
       index_sets: [
         {
-          field => 'requested_index_set',
-          'id'  => 'requested_id'
+          field.to_sym => 'requested_index_set',
+          id: 'requested_id'
         },
         {
-          'index_prefix' => 'graylog',
-          'id'  => 'default_set_id'
+          index_prefix: 'graylog',
+          id: 'default_set_id'
         }
       ]
     }

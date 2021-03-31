@@ -26,15 +26,15 @@ module GraylogAPI
     private
 
     def set_id(index_set)
-      index_set&.fetch('id')
+      index_set&.fetch(:id)
     end
 
     def preferred_set(response)
-      response.body[:index_sets].find { |set| set['index_prefix'] == index_set || set['title'] == index_set }
+      response.body[:index_sets].find { |set| set[:index_prefix] == index_set || set[:title] == index_set }
     end
 
     def default_set(response)
-      response.body[:index_sets].find { |set| set['index_prefix'] == DEFAULT_INDEX_PREFIX }
+      response.body[:index_sets].find { |set| set[:index_prefix] == DEFAULT_INDEX_PREFIX }
     end
   end
 end

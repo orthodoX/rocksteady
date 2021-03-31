@@ -1,33 +1,35 @@
 require 'rails_helper'
 
 RSpec.describe GraylogAPI::SuccessResponse do
-  subject(:successful_response) { described_class.new(response_stub) }
-
   describe '#body' do
-    context 'when the body is not empty' do
-      let(:response_stub) { OpenStruct.new(parse: {'data' => 'data'}) }
-
-      it 'returns the data with symbolized keys' do
-        expect(successful_response.body).to eq({data: 'data'})
-      end
+    it 'has one' do
+      expect(success_response('{"foo": "bar"}').body).to eq(foo: 'bar')
     end
 
-    context 'when the body is empty' do
-      let(:response_stub) { OpenStruct.new(parse: '') }
+    it 'can be empty' do
+      expect(success_response.body).to be_empty
+    end
 
-      it 'returns an empty hash' do
-        expect(successful_response.body).to eq(Hash.new)
-      end
+    it 'converts nested keys to symbols' do
+      response = success_response('{"foo": { "bar": { "qux": 42 } }}')
+      expect(response.body.dig(:foo, :bar, :qux)).to eq(42)
     end
   end
 
   describe '#successful?' do
-    context 'when the response status is success' do
-      let(:response_stub) { OpenStruct.new(status: OpenStruct.new(success?: true)) }
-
-      it 'returns true ' do
-        expect(successful_response.successful?).to be_truthy
-      end
+    it 'is always successful' do
+      expect(success_response).to be_successful
     end
+  end
+
+  def success_response(body = '{}')
+    described_class.new(
+      HTTP::Response.new(
+        status: 200,
+        version: '1.1',
+        headers: { 'Content-Type' => 'application/json' },
+        body: body
+      )
+    )
   end
 end
