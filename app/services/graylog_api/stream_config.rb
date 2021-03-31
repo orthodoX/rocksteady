@@ -39,7 +39,7 @@ module GraylogAPI
     end
 
     def index_set_id
-      @index_set ||= IndexSet.new(index_set, client).read
+      @index_set ||= IndexSet.new(index_set, client).id
     end
 
     def role

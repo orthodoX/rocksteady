@@ -6,28 +6,20 @@ module GraylogAPI
     attr_reader :client, :index_set
     private :client, :index_set
 
-    def initialize(index_set, client)
+    def initialize(index_set, client = Client.new)
       @client = client
       @index_set = index_set
     end
 
-    def read
+    def id
       response = client.get(ENDPOINT)
-
       return unless response.successful?
 
-      set = preferred_set(response)
-
-      return set_id(set) if set.present?
-
-      set_id(default_set(response))
+      set = preferred_set(response) || default_set(response)
+      set[:id] if set
     end
 
     private
-
-    def set_id(index_set)
-      index_set&.fetch(:id)
-    end
 
     def preferred_set(response)
       response.body[:index_sets].find { |set| set[:index_prefix] == index_set || set[:title] == index_set }

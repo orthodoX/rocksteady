@@ -1,67 +1,48 @@
 require 'rails_helper'
 
 RSpec.describe GraylogAPI::IndexSet do
-  subject(:index_set_instance) { described_class.new(index_set, GraylogAPI::Client.new) }
-  let(:headers) { {'Content-Type' => 'application/json'} }
+  let(:url) { "#{ENV['GRAYLOG_API_URI']}#{described_class::ENDPOINT}" }
 
-  describe '#read' do
-    context 'when the index_set is available as index_prefix' do
-      let(:index_set) { 'requested_index_set' }
+  describe '#id' do
+    context 'when success' do
+      it 'returns id from index prefix' do
+        stub_success(
+          index_sets: [
+            { index_prefix: 'repo-name', id: '1' },
+            { title: 'repo-name', id: '2' }
+          ]
+        )
+        expect(described_class.new('repo-name').id).to eq('1')
+      end
 
-      it 'returns the id' do
-        stub_request(:get, 'https://test.com/api/system/indices/index_sets')
-          .to_return(status: 200, body: response_body('index_prefix').to_json, headers: headers)
+      it 'can return id from title' do
+        stub_success(index_sets: [{ index_prefix: 'different', title: 'repo-name', id: '1' }])
+        expect(described_class.new('repo-name').id).to eq('1')
+      end
 
-        expect(index_set_instance.read).to eq 'requested_id'
+      it 'returns default id if index set not found' do
+        default_prefix = described_class::DEFAULT_INDEX_PREFIX
+        stub_success(index_sets: [{ index_prefix: default_prefix, id: '1' }])
+        expect(described_class.new('i-wont-be-found').id).to eq('1')
       end
     end
 
-    context 'when the index_set is available as title' do
-      let(:index_set) { 'requested_index_set' }
+    context 'when failure' do
+      it 'does not return id' do
+        stub_request(:get, url).to_timeout
+        expect(described_class.new('repo-name').id).to be_nil
+      end
 
-      it 'returns the id' do
-        stub_request(:get, 'https://test.com/api/system/indices/index_sets')
-          .to_return(status: 200, body: response_body('title').to_json, headers: headers)
-
-        expect(index_set_instance.read).to eq 'requested_id'
+      it 'does not return id if none is sent' do
+        stub_success(index_sets: [{ index_prefix: 'repo-name' }])
+        expect(described_class.new('repo-name').id).to be_nil
       end
     end
 
-    context 'when the index_set is not available' do
-      let(:index_set) { 'not_available' }
-
-      it 'returns the default' do
-        stub_request(:get, 'https://test.com/api/system/indices/index_sets')
-          .to_return(status: 200, body: response_body('invalid').to_json, headers: headers)
-
-        expect(index_set_instance.read).to eq 'default_set_id'
-      end
+    def stub_success(body)
+      stub_request(:get, url).to_return(
+        status: 200, body: body.to_json, headers: { 'Content-Type' => 'application/json' }
+      )
     end
-
-    context 'when the response is not successful' do
-      let(:index_set) { 'not_available' }
-
-      it 'return nil' do
-        stub_request(:get, 'https://test.com/api/system/indices/index_sets')
-          .to_return(status: 400, body: '', headers: headers)
-
-        expect(index_set_instance.read).to be_nil
-      end
-    end
-  end
-
-  def response_body(field)
-    {
-      index_sets: [
-        {
-          field.to_sym => 'requested_index_set',
-          id: 'requested_id'
-        },
-        {
-          index_prefix: 'graylog',
-          id: 'default_set_id'
-        }
-      ]
-    }
   end
 end
