@@ -87,13 +87,6 @@ When creating a stream, a read only permission is granted to the `Dev` role by d
 - An App can be updated if updating the stream fails but an alert is displayed
 - An App can be deleted if the stream cannot be deleted but an alert is displayed
 
-#### Adding the integration to an existing set of Apps
-
-A rake task to associate apps to existing streams is available and can be run with:
-`bundle exec rake graylog:integration:sync`
-
-The task is idempotent and uses the rules above for `stream_name` and `rule_value`.
-
 ## Bootstrapping
 
 RockSteady is capable of self-hosting as a job running on a Nomad cluster. An example job spec is included in [nomad_job.hcl](./nomad_job.hcl) which can be customised as appropriate for your environment.
