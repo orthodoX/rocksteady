@@ -10,7 +10,7 @@ module GraylogAPI
     end
 
     def setup
-      stream = Stream.new(client, options)
+      stream = Stream.new(options, client)
 
       return unless stream.create.successful?
 
@@ -24,7 +24,7 @@ module GraylogAPI
     end
 
     def update(stream_id)
-      stream = Stream.new(client, options.merge(stream_id: stream_id))
+      stream = Stream.new(options.merge(stream_id: stream_id), client)
 
       return unless stream.update.successful?
 
@@ -34,8 +34,8 @@ module GraylogAPI
     end
 
     def delete(stream_id)
-      stream = Stream.new(client, options.merge(stream_id: stream_id))
-      stream.delete!
+      stream = Stream.new(options.merge(stream_id: stream_id), client)
+      stream.delete
     end
 
     def index_set_id
