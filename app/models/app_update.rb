@@ -14,7 +14,7 @@ class AppUpdate
     return app unless app.valid?
 
     update_graylog if updatable?
-    AppCreation.new(app, add_stream: add_stream).add_graylog_stream if create_or_update_stream?
+    AppCreation.new(app, stream_config).create_graylog_stream if create_or_update_stream?
 
     result[:updated] = app.save
     result
@@ -41,7 +41,7 @@ class AppUpdate
   def update_graylog
     return unless app.repository_name_changed?
 
-    stream_info = GraylogAPI::StreamConfig.new(app).update(app.graylog_stream.id)
+    stream_info = stream_config.update(app.graylog_stream.id)
     return update_associated_stream(stream_info) if stream_info.present?
 
     result[:warning] = 'Graylog stream could not be updated.'
@@ -52,5 +52,9 @@ class AppUpdate
       index_set_id: stream_info[:index_set_id]
     )
     app.graylog_stream.save
+  end
+
+  def stream_config
+    @stream_config ||= GraylogAPI::StreamConfig.new(app)
   end
 end

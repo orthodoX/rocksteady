@@ -83,10 +83,7 @@ RSpec.describe AppUpdate do
       let(:add_stream) { true }
       let(:update_stream) { false }
       let(:result_stub) {
-        {
-          stream_id: '123',
-          index_set_id: '456'
-        }
+        GraylogAPI::Stream.new(stream_id: '123', title: 'valid', index_set_id: '456' )
       }
 
       it 'adds the associated stream to the app' do
@@ -106,10 +103,7 @@ RSpec.describe AppUpdate do
       let(:add_stream) { false }
       let(:update_stream) { true }
       let(:result_stub) {
-        {
-          stream_id: '123',
-          index_set_id: '456'
-        }
+        GraylogAPI::Stream.new(stream_id: '123', title: 'valid', index_set_id: '456' )
       }
 
       it 'adds the associated stream to the app' do

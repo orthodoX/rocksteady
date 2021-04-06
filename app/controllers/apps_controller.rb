@@ -32,8 +32,8 @@ class AppsController < ApplicationController
   end
 
   def create
-    @app = AppCreation.new(app_params: app_params, add_stream: add_stream?).create
-    result = @app.save
+    @app = App.new(app_params)
+    result = AppCreation.new(@app, stream_config(@app)).create
 
     respond_to do |format|
       format.html do
@@ -128,8 +128,12 @@ class AppsController < ApplicationController
     )
   end
 
+  def stream_config(app)
+    GraylogAPI::StreamConfig.new(app) if add_stream?
+  end
+
   def add_stream?
-    graylog_params[:add_graylog_stream] == '1'
+    ENV['GRAYLOG_ENABLED'].present? && graylog_params[:add_graylog_stream] == '1'
   end
 
   def update_stream?

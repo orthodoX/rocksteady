@@ -19,8 +19,9 @@ RSpec.describe GraylogAPI::StreamConfig do
         role_update_stub
       end
 
-      it 'returns ids' do
-        expect(stream_config.create).to eq(stream_id: '123', index_set_id: '1')
+      it 'returns created stream' do
+        stream = stream_config.create
+        expect(stream.id).to eq('123')
       end
 
       it 'creates a stream' do
@@ -40,25 +41,25 @@ RSpec.describe GraylogAPI::StreamConfig do
     end
 
     context 'when failure' do
-      it 'returns no ids if index set is null' do
+      it 'returns no stream if index set is null' do
         stub_request(:get, index_set_url).to_timeout
         stub_request(:post, stream_url).to_timeout
-        expect(stream_config.create).to be_empty
+        expect(stream_config.create).to be_nil
       end
 
-      it 'returns no ids if creation fails' do
+      it 'returns no stream if creation fails' do
         index_set_stub
         stub_request(:post, stream_url).to_timeout
-        expect(stream_config.create).to be_empty
+        expect(stream_config.create).to be_nil
       end
 
-      it 'returns no ids if creation succeeds but role update fails' do
+      it 'returns no stream if creation succeeds but role update fails' do
         index_set_stub
         stream_creation_stub
         stream_start_stub
         role_read_stub
         stub_request(:put, role_url).to_timeout
-        expect(stream_config.create).to be_empty
+        expect(stream_config.create).to be_nil
       end
 
       it 'does not start the stream' do

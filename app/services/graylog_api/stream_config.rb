@@ -12,15 +12,12 @@ module GraylogAPI
 
     def create
       stream = build_stream
-      return {} unless stream.create.successful?
+      return unless stream.create.successful?
 
       stream.start
-      return {} unless role.update(stream.id).successful?
+      return unless role.update(stream.id).successful?
 
-      {
-        stream_id: stream.id,
-        index_set_id: stream.index_set_id
-      }
+      stream
     end
 
     def update(stream_id)
