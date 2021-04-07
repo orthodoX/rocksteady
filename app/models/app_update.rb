@@ -1,60 +1,50 @@
 class AppUpdate
-  attr_reader :app, :add_stream, :update_stream, :result
-  private :app, :add_stream, :update_stream, :result
+  attr_reader :app, :stream_config, :result
+  private :app, :stream_config, :result
 
-  def initialize(app, options)
+  def initialize(app, stream_config = nil)
     @app = app
-    @add_stream = options[:add_stream]
-    @update_stream = options[:update_stream]
+    @stream_config = stream_config
     @result = {}
   end
 
   def update(app_params)
     app.assign_attributes(app_params)
-    return app unless app.valid?
+    create_or_update_graylog_stream
+    update_app
 
-    update_graylog if updatable?
-    AppCreation.new(app, stream_config).create_graylog_stream if create_or_update_stream?
-
-    result[:updated] = app.save
     result
   end
 
   private
 
-  def add_stream?
-    ENV['GRAYLOG_ENABLED'].present? && add_stream
+  def create_or_update_graylog_stream
+    return create_graylog_stream if create_stream?
+
+    update_graylog_stream if update_stream?
+  end
+
+  def create_stream?
+    stream_config && app.graylog_stream.blank?
   end
 
   def update_stream?
-    ENV['GRAYLOG_ENABLED'].present? && update_stream
+    app.graylog_stream.present? && app.repository_name_changed?
   end
 
-  def updatable?
-    update_stream? && app.graylog_stream.present?
+  def create_graylog_stream
+    AppCreation.new(app, stream_config).create_graylog_stream
   end
 
-  def create_or_update_stream?
-    add_stream? || (update_stream? && app.graylog_stream.blank?)
+  def update_graylog_stream
+    stream = stream_config.update(app.graylog_stream.id)
+    return result[:warning] = true if stream.blank?
+
+    app.graylog_stream.assign_attributes(index_set_id: stream.index_set_id)
+    app.graylog_stream.save!
   end
 
-  def update_graylog
-    return unless app.repository_name_changed?
-
-    stream_info = stream_config.update(app.graylog_stream.id)
-    return update_associated_stream(stream_info) if stream_info.present?
-
-    result[:warning] = 'Graylog stream could not be updated.'
-  end
-
-  def update_associated_stream(stream_info)
-    app.graylog_stream.assign_attributes(
-      index_set_id: stream_info[:index_set_id]
-    )
-    app.graylog_stream.save
-  end
-
-  def stream_config
-    @stream_config ||= GraylogAPI::StreamConfig.new(app)
+  def update_app
+    result[:updated] = app.save
   end
 end

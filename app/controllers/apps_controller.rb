@@ -58,7 +58,7 @@ class AppsController < ApplicationController
   def edit; end
 
   def update
-    result = AppUpdate.new(@app, add_stream: add_stream?, update_stream: update_stream?).update(app_params)
+    result = AppUpdate.new(@app, stream_config(@app)).update(app_params)
 
     respond_to do |format|
       format.html do
@@ -73,7 +73,9 @@ class AppsController < ApplicationController
 
       format.json do
         if result[:updated]
-          render status: :ok, json: result[:warning] ? { warning: result[:warning], app: @app } : { app: @app }
+          json = { app: @app }
+          json.merge(warning: 'Graylog stream could not be updated.') if result[:warning]
+          render status: :ok, json: json
         else
           render status: :bad_request, json: { error: "Error: #{@app.name} could not be updated" }
         end
@@ -123,20 +125,17 @@ class AppsController < ApplicationController
 
   def graylog_params
     params.require(:app).permit(
-      :add_graylog_stream,
-      :update_graylog_stream
+      :with_stream
     )
   end
 
   def stream_config(app)
-    GraylogAPI::StreamConfig.new(app) if add_stream?
+    GraylogAPI::StreamConfig.new(app) if with_stream?
   end
 
-  def add_stream?
-    ENV['GRAYLOG_ENABLED'].present? && graylog_params[:add_graylog_stream] == '1'
-  end
-
-  def update_stream?
-    graylog_params[:update_graylog_stream] == '1'
+  def with_stream?
+    ENV['GRAYLOG_ENABLED'].present? && (
+      @app.graylog_stream.present? || graylog_params[:with_stream] == '1'
+    )
   end
 end

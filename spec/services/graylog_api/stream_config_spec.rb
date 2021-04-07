@@ -127,13 +127,13 @@ RSpec.describe GraylogAPI::StreamConfig do
         stream_update_stub
       end
 
+      it 'returns the stream' do
+        expect(stream_config.update('123').index_set_id).to eq('1')
+      end
+
       it 'updates the stream' do
         stream_config.update('123')
         expect(stream_update_stub).to have_been_requested.once
-      end
-
-      it 'returns the index set id' do
-        expect(stream_config.update('123')).to eq(index_set_id: '1')
       end
 
       def stream_update_stub
@@ -144,16 +144,16 @@ RSpec.describe GraylogAPI::StreamConfig do
     end
 
     context 'when failure' do
-      it 'returns no index set id' do
+      it 'returns no stream' do
         index_set_stub
         stub_request(:put, "#{stream_url}/123").to_timeout
-        expect(stream_config.update('123')).to be_empty
+        expect(stream_config.update('123')).to be_nil
       end
 
-      it 'returns no index set id if index set request fails' do
+      it 'returns no stream if index set request fails' do
         stub_request(:get, index_set_url).to_timeout
         stub_request(:put, "#{stream_url}/123").to_timeout
-        expect(stream_config.update('123')).to be_empty
+        expect(stream_config.update('123')).to be_nil
       end
     end
   end

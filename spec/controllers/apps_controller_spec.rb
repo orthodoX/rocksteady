@@ -160,19 +160,13 @@ RSpec.describe AppsController, type: :controller do
 
     it 'does not show Graylog UI elements' do
       get :new
-      expect(response.body).to_not include('app_add_graylog_stream')
+      expect(response.body).to_not include('app_with_stream')
     end
 
     it 'shows Graylog UI elements if enabled' do
       enable_graylog
       get :new
-      expect(response.body).to include('app_add_graylog_stream')
-    end
-
-    it 'does not show Graylog update-related UI elements' do
-      enable_graylog
-      get :new
-      expect(response.body).to_not include('app_update_graylog_stream')
+      expect(response.body).to include('app_with_stream')
     end
   end
 
@@ -189,7 +183,7 @@ RSpec.describe AppsController, type: :controller do
     it 'creates a new app with a Graylog stream' do
       enable_graylog
       stub_stream_creation
-      create_app(add_graylog_stream: '1')
+      create_app(with_stream: '1')
       expect(App.last.graylog_stream).to_not be_nil
     end
 
@@ -201,7 +195,7 @@ RSpec.describe AppsController, type: :controller do
     it 'does not create a new app with stream validation errors' do
       enable_graylog
       stub_stream_creation_failure
-      create_app(add_graylog_stream: '1')
+      create_app(with_stream: '1')
       expect(App).to_not exist
     end
 
@@ -278,13 +272,13 @@ RSpec.describe AppsController, type: :controller do
 
     it 'does not show Graylog UI elements' do
       edit_app
-      expect(response.body).to_not include('app_add_graylog_stream')
+      expect(response.body).to_not include('app_with_stream')
     end
 
     it 'shows Graylog UI elements if enabled' do
       enable_graylog
       edit_app
-      expect(response.body).to include('app_add_graylog_stream')
+      expect(response.body).to include('app_with_stream')
     end
 
     it 'throws a 404 if app not found' do
@@ -300,12 +294,8 @@ RSpec.describe AppsController, type: :controller do
       end
 
       it 'ticks and disables Graylog checkbox' do
-        graylog_checkbox = '<input class="form-check-input" disabled="disabled" type="checkbox" value="1" checked="checked" name="app[add_graylog_stream]" id="app_add_graylog_stream" />'
+        graylog_checkbox = '<input class="form-check-input" disabled="disabled" type="checkbox" value="1" checked="checked" name="app[with_stream]" id="app_with_stream" />'
         expect(response.body).to include(graylog_checkbox)
-      end
-
-      it 'displays Graylog update-related UI elements' do
-        expect(response.body).to include('app_update_graylog_stream')
       end
     end
 
@@ -316,12 +306,8 @@ RSpec.describe AppsController, type: :controller do
       end
 
       it 'does not tick or disable Graylog checkbox' do
-        graylog_checkbox = '<input class="form-check-input" type="checkbox" value="1" name="app[add_graylog_stream]" id="app_add_graylog_stream" />'
+        graylog_checkbox = '<input class="form-check-input" type="checkbox" value="1" name="app[with_stream]" id="app_with_stream" />'
         expect(response.body).to include(graylog_checkbox)
-      end
-
-      it 'does not display Graylog update-related UI elements' do
-        expect(response.body).to_not include('app_update_graylog_stream')
       end
     end
   end
@@ -346,7 +332,7 @@ RSpec.describe AppsController, type: :controller do
     it 'updates an existing app to create stream' do
       enable_graylog
       stub_stream_creation
-      update_app(id: existing.id, add_graylog_stream: '1')
+      update_app(id: existing.id, with_stream: '1')
       expect(existing.reload.graylog_stream).to_not be_nil
     end
 
@@ -354,7 +340,7 @@ RSpec.describe AppsController, type: :controller do
       enable_graylog
       add_stream
       stub_stream_update(repository_name: 'updated', index_set_id: '42')
-      update_app(id: existing.id, update_graylog_stream: '1', repository_name: 'updated')
+      update_app(id: existing.id, with_stream: '1', repository_name: 'updated')
       expect(existing.reload.graylog_stream.index_set_id).to eq('42')
     end
 
@@ -367,7 +353,7 @@ RSpec.describe AppsController, type: :controller do
       enable_graylog
       add_stream
       stub_stream_update_failure
-      update_app(id: existing.id, update_graylog_stream: '1', repository_name: 'updated')
+      update_app(id: existing.id, with_stream: '1', repository_name: 'updated')
       expect(existing.reload.repository_name).to eq('updated')
     end
 

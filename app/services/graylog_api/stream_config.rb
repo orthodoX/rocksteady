@@ -22,9 +22,7 @@ module GraylogAPI
 
     def update(stream_id)
       stream = build_stream(stream_id: stream_id)
-      return {} unless stream.update.successful?
-
-      { index_set_id: stream.index_set_id }
+      stream if stream.update.successful?
     end
 
     def delete(stream_id)
