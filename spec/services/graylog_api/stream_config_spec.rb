@@ -160,10 +160,10 @@ RSpec.describe GraylogAPI::StreamConfig do
 
   describe '#delete' do
     context 'when success' do
-      it 'is successful' do
+      it 'returns the stream' do
         index_set_stub
         stream_deletion_stub
-        expect(stream_config.delete('123')).to be_successful
+        expect(stream_config.delete('123').id).to eq('123')
       end
 
       def stream_deletion_stub
@@ -174,10 +174,10 @@ RSpec.describe GraylogAPI::StreamConfig do
     end
 
     context 'when failure' do
-      it 'is not successful' do
+      it 'returns no stream' do
         index_set_stub
         stub_request(:delete, "#{stream_url}/123").to_timeout
-        expect(stream_config.delete('123')).to_not be_successful
+        expect(stream_config.delete('123')).to be_nil
       end
     end
   end

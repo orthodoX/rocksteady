@@ -84,13 +84,13 @@ class AppsController < ApplicationController
   end
 
   def destroy
-    result = AppDeletion.new(@app).delete!
+    result = AppDeletion.new(@app, stream_config(@app)).delete
 
     respond_to do |format|
       format.html do
-        if result[:deleted] && @app&.destroy
+        if result[:deleted]
           flash[:notice] = 'App has been removed from Nomad and deleted'
-          flash[:warning] = result[:warning] if result[:warning]
+          flash[:warning] = 'Graylog stream could not be deleted' if result[:warning]
           redirect_to action: :index
         else
           flash[:error] = 'Could not delete app'
@@ -100,10 +100,12 @@ class AppsController < ApplicationController
       end
 
       format.json do
-        if result[:deleted] && @app&.destroy
-          render status: :ok, json: result[:warning] ? { warning: result[:warning], app: 'App deleted' } : { app: 'App deleted' }
+        if result[:deleted]
+          json = { app: @app }
+          json.merge(warning: 'Could not delete Graylog stream for App') if result[:warning]
+          render status: :ok, json: json
         else
-          render status: :bad_request, json: { error: 'Error: App could not be deleted' }
+          render status: :bad_request, json: { error: "Error: #{@app.name} could not be deleted" }
         end
       end
     end

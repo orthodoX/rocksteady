@@ -508,7 +508,7 @@ RSpec.describe AppsController, type: :controller do
 
       it 'returns the app as JSON' do
         delete_app
-        expect(JSON.parse(response.body)['app']).to eq('App deleted')
+        expect(JSON.parse(response.body)['app']['name']).to eq('testapp')
       end
 
       it 'returns bad request status on error' do

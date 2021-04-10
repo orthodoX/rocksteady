@@ -27,7 +27,7 @@ module GraylogAPI
 
     def delete(stream_id)
       stream = build_stream(stream_id: stream_id)
-      stream.delete
+      stream if stream.delete.successful?
     end
 
     private
