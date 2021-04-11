@@ -1,6 +1,6 @@
 # Graylog Integration
 
-It is possible to associate an app with a Graylog stream. The `GRAYLOG_ENABLED` flag gives control over enabling or disabling this feature. Remove the flag to disable the feature.
+It is possible to associate an app with a Graylog stream.
 
 ## Authentication
 

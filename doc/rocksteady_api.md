@@ -1,6 +1,6 @@
 # Rocksteady API
 
-Rocksteady apps can be created/updated/deleted through the web interface or through the API. In both cases, apps can exist with or without a Graylog stream. This is established by setting the `with_stream` flag in the payload. The `GRAYLOG_ENABLED` environment variable has to be present if we want an app with a stream.
+Rocksteady apps can be created/updated/deleted through the web interface or through the API. In both cases, apps can exist with or without a Graylog stream. This is established by setting the `with_stream` flag in the payload.
 
 ## Authentication
 
@@ -20,7 +20,7 @@ Headers:
 
 Apps are not referenced by id, but by **name**.
 
-For an app with a Graylog stream, set `with_stream` to `'1'` in the payload and add the `GRAYLOG_ENABLED` variable to your environment. Check the [docs on the Graylog API](doc/graylog_api.md).
+For an app with a Graylog stream, set `with_stream` to `'1'` in the payload. Check the [docs on the Graylog API](doc/graylog_api.md).
 
 
 ### Create app

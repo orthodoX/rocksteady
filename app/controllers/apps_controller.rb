@@ -136,8 +136,6 @@ class AppsController < ApplicationController
   end
 
   def with_stream?
-    ENV['GRAYLOG_ENABLED'].present? && (
-      @app.graylog_stream.present? || graylog_params[:with_stream] == '1'
-    )
+    @app.graylog_stream.present? || params.dig(:app, :with_stream) == '1'
   end
 end

@@ -25,11 +25,10 @@
     %small.form-text.text-muted Select whether images will be sourced from Docker Hub or a private ECR repository.
 
 
-  - if ENV['GRAYLOG_ENABLED'].present?
-    .form-group.form-check
-      = f.check_box :with_stream, class: 'form-check-input', checked: @app.graylog_stream.present?, disabled: @app.graylog_stream.present?
-      = f.label :with_stream, "With Graylog stream"
-      %small.form-text.text-muted Tick for an app with an associated Graylog stream. Updating the 'Repository name' field will update the index that the stream belongs to.
+  .form-group.form-check
+    = f.check_box :with_stream, class: 'form-check-input', checked: @app.graylog_stream.present?, disabled: @app.graylog_stream.present?
+    = f.label :with_stream, "With Graylog stream"
+    %small.form-text.text-muted Tick for an app with an associated Graylog stream. Updating the 'Repository name' field will update the index that the stream belongs to.
 
 
   .form-group.required

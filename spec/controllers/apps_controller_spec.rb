@@ -158,13 +158,7 @@ RSpec.describe AppsController, type: :controller do
       expect(response.body).to include('Create an app')
     end
 
-    it 'does not show Graylog UI elements' do
-      get :new
-      expect(response.body).to_not include('app_with_stream')
-    end
-
-    it 'shows Graylog UI elements if enabled' do
-      enable_graylog
+    it 'shows Graylog UI elements' do
       get :new
       expect(response.body).to include('app_with_stream')
     end
@@ -181,7 +175,6 @@ RSpec.describe AppsController, type: :controller do
     end
 
     it 'creates a new app with a Graylog stream' do
-      enable_graylog
       stub_stream_creation
       create_app(with_stream: '1')
       expect(App.last.graylog_stream).to_not be_nil
@@ -193,7 +186,6 @@ RSpec.describe AppsController, type: :controller do
     end
 
     it 'does not create a new app with stream validation errors' do
-      enable_graylog
       stub_stream_creation_failure
       create_app(with_stream: '1')
       expect(App).to_not exist
@@ -270,13 +262,7 @@ RSpec.describe AppsController, type: :controller do
       expect(response.body).to include('testapp')
     end
 
-    it 'does not show Graylog UI elements' do
-      edit_app
-      expect(response.body).to_not include('app_with_stream')
-    end
-
-    it 'shows Graylog UI elements if enabled' do
-      enable_graylog
+    it 'shows Graylog UI elements' do
       edit_app
       expect(response.body).to include('app_with_stream')
     end
@@ -288,10 +274,7 @@ RSpec.describe AppsController, type: :controller do
     end
 
     context 'when app has a stream' do
-      before do
-        enable_graylog
-        edit_app(graylog_stream)
-      end
+      before { edit_app(graylog_stream) }
 
       it 'ticks and disables Graylog checkbox' do
         graylog_checkbox = '<input class="form-check-input" disabled="disabled" type="checkbox" value="1" checked="checked" name="app[with_stream]" id="app_with_stream" />'
@@ -300,10 +283,7 @@ RSpec.describe AppsController, type: :controller do
     end
 
     context 'when app has no stream' do
-      before do
-        enable_graylog
-        edit_app
-      end
+      before { edit_app }
 
       it 'does not tick or disable Graylog checkbox' do
         graylog_checkbox = '<input class="form-check-input" type="checkbox" value="1" name="app[with_stream]" id="app_with_stream" />'
@@ -330,14 +310,12 @@ RSpec.describe AppsController, type: :controller do
     end
 
     it 'updates an existing app to create stream' do
-      enable_graylog
       stub_stream_creation
       update_app(id: existing.id, with_stream: '1')
       expect(existing.reload.graylog_stream).to_not be_nil
     end
 
     it 'updates an existing app and its stream' do
-      enable_graylog
       add_stream
       stub_stream_update(repository_name: 'updated', index_set_id: '42')
       update_app(id: existing.id, with_stream: '1', repository_name: 'updated')
@@ -350,7 +328,6 @@ RSpec.describe AppsController, type: :controller do
     end
 
     it 'updates an app with stream validation errors' do
-      enable_graylog
       add_stream
       stub_stream_update_failure
       update_app(id: existing.id, with_stream: '1', repository_name: 'updated')
@@ -434,14 +411,12 @@ RSpec.describe AppsController, type: :controller do
     end
 
     it 'deletes an existing app with a Graylog stream' do
-      enable_graylog
       add_stream
       delete_app
       expect(App).to_not exist
     end
 
     it 'deletes associated Graylog stream' do
-      enable_graylog
       add_stream
       delete_app
       expect(GraylogStream).to_not exist
@@ -454,7 +429,6 @@ RSpec.describe AppsController, type: :controller do
     end
 
     it 'deletes an app on stream deletion error' do
-      enable_graylog
       add_stream
       stub_nomad_job_deletion
       stub_stream_deletion_failure
@@ -523,10 +497,6 @@ RSpec.describe AppsController, type: :controller do
         expect(JSON.parse(response.body)['error']).to include('could not be deleted')
       end
     end
-  end
-
-  def enable_graylog
-    stub_const('ENV', ENV.to_hash.merge('GRAYLOG_ENABLED' => 'true'))
   end
 
   def graylog_stream
