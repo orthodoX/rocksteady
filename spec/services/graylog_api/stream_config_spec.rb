@@ -8,15 +8,18 @@ RSpec.describe GraylogAPI::StreamConfig do
 
   let(:index_set_url) { "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::IndexSet::ENDPOINT}" }
   let(:stream_url) { "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::Stream::ENDPOINT}" }
-  let(:role_url) { "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::Role::ENDPOINT}/#{described_class::ROLE}" }
 
   describe '#create' do
+    let(:shares_url) { "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::Shares::ENDPOINT}123" }
+    let(:users_url) { "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::AllowedUsers::ENDPOINT}" }
+
     context 'when success' do
       before do
         index_set_stub
         stream_creation_stub
         stream_start_stub
-        role_update_stub
+        users_stub
+        shares_creation_stub
       end
 
       it 'returns created stream' do
@@ -34,9 +37,14 @@ RSpec.describe GraylogAPI::StreamConfig do
         expect(stream_start_stub).to have_been_requested.once
       end
 
-      it 'adds new stream to the role permissions' do
+      it 'gets all allowed users to share stream with' do
         stream_config.create
-        expect(role_update_stub).to have_been_requested.once
+        expect(users_stub).to have_been_requested.once
+      end
+
+      it 'shares new stream with allowed users' do
+        stream_config.create
+        expect(shares_creation_stub).to have_been_requested.once
       end
     end
 
@@ -53,15 +61,6 @@ RSpec.describe GraylogAPI::StreamConfig do
         expect(stream_config.create).to be_nil
       end
 
-      it 'returns no stream if creation succeeds but role update fails' do
-        index_set_stub
-        stream_creation_stub
-        stream_start_stub
-        role_read_stub
-        stub_request(:put, role_url).to_timeout
-        expect(stream_config.create).to be_nil
-      end
-
       it 'does not start the stream' do
         index_set_stub
         stub_request(:post, stream_url).to_timeout
@@ -69,23 +68,38 @@ RSpec.describe GraylogAPI::StreamConfig do
         expect(stream_start_stub).to_not have_been_requested
       end
 
-      it 'does not update role permissions' do
+      it 'does not share permissions' do
         index_set_stub
         stub_request(:post, stream_url).to_timeout
         stream_config.create
-        expect(role_update_stub).to_not have_been_requested
+        expect(shares_creation_stub).to_not have_been_requested
       end
 
-      it 'does not update role permissions if creation succeeds but role update fails' do
+      it 'is unsuccessful if creation succeeds but users fails' do
         index_set_stub
         stream_creation_stub
         stream_start_stub
-        stub_request(:get, role_url).to_timeout
-        update = stub_request(:put, role_url)
+        stub_request(:get, users_url).to_timeout
+        shares_creation_stub
+        expect(stream_config.create).to be_nil
+      end
 
-        stream_config.create
+      it 'is unsuccessful if creation succeeds but no allowed users' do
+        index_set_stub
+        stream_creation_stub
+        stream_start_stub
+        users_stub(users: [{ id: 'userid1', email: 'uno@example.com' }])
+        shares_creation_stub
+        expect(stream_config.create).to be_nil
+      end
 
-        expect(update).to_not have_been_requested
+      it 'is unsuccessful if creation succeeds but sharing fails' do
+        index_set_stub
+        stream_creation_stub
+        stream_start_stub
+        users_stub
+        stub_request(:post, shares_url).to_timeout
+        expect(stream_config.create).to be_nil
       end
     end
 
@@ -99,23 +113,15 @@ RSpec.describe GraylogAPI::StreamConfig do
       stub_request(:post, "#{stream_url}/123#{GraylogAPI::Stream::START_PATH}").to_return(status: 204, body: '')
     end
 
-    def role_read_stub
-      dev_role = {
-        name: 'Dev',
-        description: 'Altmetric developers',
-        permissions: ['streams:read:321'],
-        read_only: false
-      }
-      stub_request(:get, role_url).to_return(
-        status: 200, body: dev_role.to_json, headers: { 'Content-Type': 'application/json' }
+    def users_stub(users = { users: [{ id: 'userid1', email: 'uno@allowed.com' }] })
+      stub_request(:get, users_url).to_return(
+        status: 200, body: users.to_json, headers: { 'Content-Type': 'application/json' }
       )
     end
 
-    def role_update_stub
-      dev_role = JSON.parse(role_read_stub.response.body, symbolize_names: true)
-      dev_role[:permissions] = ['streams:read:321', 'streams:read:123']
-      stub_request(:put, role_url).to_return(
-        status: 200, body: dev_role.to_json, headers: { 'Content-Type': 'application/json' }
+    def shares_creation_stub
+      stub_request(:post, shares_url).to_return(
+        status: 200, body: { key: 'value'}.to_json, headers: { 'Content-Type': 'application/json' }
       )
     end
   end

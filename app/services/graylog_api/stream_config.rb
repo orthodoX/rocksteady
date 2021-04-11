@@ -15,7 +15,7 @@ module GraylogAPI
       return unless stream.create.successful?
 
       stream.start
-      return unless role.update(stream.id).successful?
+      return unless share(stream).successful?
 
       stream
     end
@@ -39,8 +39,11 @@ module GraylogAPI
       Stream.new(options, client)
     end
 
-    def role
-      @role ||= Role.new(ROLE, client)
+    def share(stream)
+      user_ids = AllowedUsers.new(client).all_ids
+      return FailureResponse.new(Error::NoAllowedUsers.new) if user_ids.empty?
+
+      Shares.new(client).create(stream.id, user_ids)
     end
   end
 end

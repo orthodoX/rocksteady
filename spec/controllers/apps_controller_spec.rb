@@ -536,7 +536,8 @@ RSpec.describe AppsController, type: :controller do
   def stub_stream_creation
     stub_index
     stub_start
-    stub_role
+    stub_users
+    stub_shares_creation
   end
 
   def stub_stream_creation_failure
@@ -600,17 +601,16 @@ RSpec.describe AppsController, type: :controller do
     )
   end
 
-  def stub_role
-    role_url = "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::Role::ENDPOINT}/Dev"
-    dev_role = {
-      name: 'Dev', description: 'Altmetric developers', permissions: ['streams:read:321'], read_only: false
-    }
-    stub_request(:get, role_url).to_return(
-      status: 200, body: dev_role.to_json, headers: { 'Content-Type': 'application/json' }
+  def stub_users
+    users = { users: [{ id: 'userid1', email: 'uno@allowed.com' }] }
+    stub_request(:get, "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::AllowedUsers::ENDPOINT}").to_return(
+      status: 200, body: users.to_json, headers: { 'Content-Type': 'application/json' }
     )
-    dev_role[:permissions] = ['streams:read:321', 'streams:read:1']
-    stub_request(:put, role_url).to_return(
-      status: 200, body: dev_role.to_json, headers: { 'Content-Type': 'application/json' }
+  end
+
+  def stub_shares_creation
+    stub_request(:post, "#{ENV['GRAYLOG_API_URI']}#{GraylogAPI::Shares::ENDPOINT}1").to_return(
+      status: 200, body: { key: 'value'}.to_json, headers: { 'Content-Type': 'application/json' }
     )
   end
 end
