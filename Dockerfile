@@ -1,4 +1,4 @@
-FROM ruby:2.6.5-alpine as assets
+FROM ruby:2.6.7-alpine as assets
 ENV RAILS_ENV production
 WORKDIR /app
 RUN apk add --update build-base nodejs yarn git tzdata postgresql-dev
@@ -9,13 +9,13 @@ RUN yarn install
 COPY . ./
 RUN bundle exec rails webpacker:compile
 
-FROM ruby:2.6.5-alpine as bundler
+FROM ruby:2.6.7-alpine as bundler
 WORKDIR /app
 COPY Gemfile Gemfile.lock ./
 COPY --from=assets /usr/local/bundle /usr/local/bundle
 RUN bundle install --clean --without "test development darwin"
 
-FROM ruby:2.6.5-alpine
+FROM ruby:2.6.7-alpine
 WORKDIR /app
 RUN apk add --update tzdata libpq
 ENV RAILS_ENV production
