@@ -1,7 +1,7 @@
 FROM ruby:2.6.7-alpine as assets
 ENV RAILS_ENV production
 WORKDIR /app
-RUN apk add --update build-base nodejs yarn git tzdata postgresql-dev
+RUN apk add --update build-base nodejs yarn git tzdata postgresql-dev python2
 COPY Gemfile Gemfile.lock ./
 RUN bundle install
 COPY package.json yarn.lock ./
