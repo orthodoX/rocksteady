@@ -1,101 +1,125 @@
 require 'rails_helper'
 
 RSpec.describe AppCreation do
-  subject(:app_creation) { described_class.new(options) }
-  let(:options) { { app_params: app_params, add_stream: add_stream } }
+  subject(:app_creation) { described_class.new(app, stream_config) }
 
-  let(:stream_config_instance) { instance_double(GraylogAPI::StreamConfig) }
+  let(:stream) { GraylogAPI::Stream.new(stream_id: '1', title: 'valid', index_set_id: '42') }
 
-  describe 'create' do
-    before do
-      stub_const('ENV', ENV.to_hash.merge('GRAYLOG_ENABLED' => 'true'))
-      allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
+  def app_attributes(attributes = {})
+    {
+      name: 'valid',
+      description: 'description',
+      image_source: 'ecr',
+      repository_name: 'repository',
+      auto_deploy: false,
+      auto_deploy_branch: 'main',
+      job_spec: 'job {}'
+    }.merge(attributes)
+  end
+
+  describe '#create' do
+    context 'when successful with no stream' do
+      let(:app) { App.new(app_attributes) }
+      let(:stream_config) { nil }
+
+      it 'is successful' do
+        expect(app_creation.create).to eq(true)
+      end
+
+      it 'saves the app' do
+        expect { app_creation.create }.to change(App, :count).by(1)
+      end
+
+      it 'does not create a stream' do
+        expect { app_creation.create }.to_not change(GraylogStream, :count)
+      end
+
+      it 'does not associate app with a stream' do
+        app_creation.create
+        expect(app.reload.graylog_stream).to be_nil
+      end
     end
 
-    context 'when the app is invalid' do
-      let(:app_params) { { name: 'not valid', repository_name: 'test', job_spec: '{}' } }
-      let(:add_stream) { true }
+    context 'when successful with a stream' do
+      let(:app) { App.new(app_attributes) }
+      let(:stream_config) { instance_double(GraylogAPI::StreamConfig, create: stream) }
 
-      it 'does not set up Graylog if the app is invalid' do
-        app_creation.create
-
-        expect(GraylogAPI::StreamConfig).to_not have_received(:new)
+      it 'is successful' do
+        expect(app_creation.create).to eq(true)
       end
 
-      it 'returns the app instance' do
-        expect(app_creation.create).to be_an(App)
+      it 'saves the app' do
+        expect { app_creation.create }.to change(App, :count).by(1)
+      end
+
+      it 'creates a stream' do
+        expect { app_creation.create }.to change(GraylogStream, :count).by(1)
+      end
+
+      it 'associates app with stream' do
+        app_creation.create
+        expect(app.reload.graylog_stream.attributes).to include(
+          'id' => '1',
+          'name' => 'valid',
+          'rule_value' => 'valid',
+          'index_set_id' => '42'
+        )
       end
     end
 
-    context 'when add_graylog_stream is false' do
-      let(:app_params) { { name: 'name', repository_name: 'test', job_spec: '{}' } }
-      let(:add_stream) { false }
+    context 'when unsuccessful with no stream' do
+      let(:app) { App.new(app_attributes(name: 'not valid')) }
+      let(:stream_config) { nil }
 
-      it 'does not set up Graylog' do
-        app_creation.create
-
-        expect(GraylogAPI::StreamConfig).to_not have_received(:new)
+      it 'is unsuccessful' do
+        expect(app_creation.create).to eq(false)
       end
 
-      it 'returns the app instance' do
-        expect(app_creation.create).to be_an(App)
+      it 'does not save the app' do
+        expect { app_creation.create }.to_not change(App, :count)
       end
     end
 
-    context 'when add_graylog_stream is true' do
-      let(:app_params) { { name: 'name', repository_name: 'test', job_spec: '{}' } }
-      let(:add_stream) { false }
+    context 'when unsuccessful with a stream' do
+      let(:app) { App.new(app_attributes) }
+      let(:stream_config) { instance_double(GraylogAPI::StreamConfig, create: nil) }
 
-      it 'sets up Graylog' do
-        allow(stream_config_instance).to receive(:setup)
-
-        app_creation.create
-
-        expect(stream_config_instance).to_not have_received(:setup)
+      it 'is unsuccessful' do
+        expect(app_creation.create).to eq(false)
       end
 
-      it 'returns the app instance' do
-        expect(app_creation.create).to be_an(App)
+      it 'does not save the app' do
+        expect { app_creation.create }.to_not change(App, :count)
+      end
+
+      it 'does not create a stream' do
+        expect { app_creation.create }.to_not change(GraylogStream, :count)
+      end
+
+      it 'does not associate app with stream' do
+        app_creation.create
+        expect(app.graylog_stream).to be_nil
       end
     end
   end
 
-  describe '#add_graylog_stream' do
-    let(:options) { { app_params: app_params, add_stream: add_stream } }
-    let(:app_params) { { name: 'name', repository_name: 'test', job_spec: '{}' } }
-      let(:add_stream) { true }
+  describe '#create_graylog_stream' do
+    let(:app) { App.new(app_attributes) }
 
-    before { stub_const('ENV', ENV.to_hash.merge('GRAYLOG_ENABLED' => 'true')) }
-
-    context 'when the result is successful' do
-      let(:result_stub) {
-        {
-          stream_id: '123',
-          index_set_id: '456'
-        }
-      }
+    context 'when successful' do
+      let(:stream_config) { instance_double(GraylogAPI::StreamConfig, create: stream) }
 
       it 'builds the association' do
-        stream_config_instance = instance_double(GraylogAPI::StreamConfig)
-
-        allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
-        allow(stream_config_instance).to receive(:setup).and_return(result_stub)
-
-        app = app_creation.add_graylog_stream
-
+        app_creation.create_graylog_stream
         expect(app.graylog_stream).to_not be_nil
       end
     end
 
-    context 'when the result is not successful' do
+    context 'when unsuccessful' do
+      let(:stream_config) { instance_double(GraylogAPI::StreamConfig, create: nil) }
+
       it 'does not build the association' do
-        stream_config_instance = instance_double(GraylogAPI::StreamConfig)
-
-        allow(GraylogAPI::StreamConfig).to receive(:new).and_return(stream_config_instance)
-        allow(stream_config_instance).to receive(:setup)
-
-        app = app_creation.add_graylog_stream
-
+        app_creation.create_graylog_stream
         expect(app.graylog_stream).to be_nil
       end
     end

@@ -8,7 +8,11 @@ module GraylogAPI
     end
 
     def body
-      { type: error.class.name, message: error.message, stack_trace: error.full_message }
+      {
+        type: error.class.name,
+        message: error.message,
+        stack_trace: error.full_message
+      }
     end
 
     def successful?

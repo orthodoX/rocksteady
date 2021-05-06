@@ -12,19 +12,19 @@ module GraylogAPI
     end
 
     def get(endpoint)
-      rescue_errors { http.get(URI("#{uri}#{endpoint}").to_s) }
+      rescue_errors { http.get(url(endpoint)) }
     end
 
     def post(endpoint, payload)
-      rescue_errors { http.post(URI("#{uri}#{endpoint}").to_s, json: payload) }
+      rescue_errors { http.post(url(endpoint), json: payload) }
     end
 
-    def put(endpoint, payload, id: nil)
-      rescue_errors { http.put(build_uri(endpoint, id).to_s, json: payload) }
+    def put(endpoint, payload)
+      rescue_errors { http.put(url(endpoint), json: payload) }
     end
 
-    def delete(endpoint, id)
-      rescue_errors { http.delete(URI("#{uri}#{endpoint}/#{id}").to_s) }
+    def delete(endpoint)
+      rescue_errors { http.delete(url(endpoint)) }
     end
 
     private
@@ -35,14 +35,14 @@ module GraylogAPI
       FailureResponse.new(e)
     end
 
-    def http
-      HTTP.headers(accept: 'application/json', 'X-Requested-By': 'Graylog API bot').basic_auth(
-        user: user, pass: password
-      )
+    def url(endpoint)
+      URI("#{uri}#{endpoint}").to_s
     end
 
-    def build_uri(endpoint, id)
-      id ? URI("#{uri}#{endpoint}/#{id}") : URI("#{uri}#{endpoint}")
+    def http
+      HTTP
+        .headers(accept: 'application/json', 'X-Requested-By': 'Graylog API bot')
+        .basic_auth(user: user, pass: password)
     end
   end
 end

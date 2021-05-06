@@ -2,11 +2,8 @@ require 'rails_helper'
 
 RSpec.describe GraylogAPI::Client do
   subject(:client) { described_class.new }
-  let(:url) { "#{ENV['GRAYLOG_API_URI']}/endpoint" }
 
-  before do
-    stub_const('ENV', ENV.to_hash.merge('GRAYLOG_ENABLED' => 'true'))
-  end
+  let(:url) { "#{ENV['GRAYLOG_API_URI']}/endpoint" }
 
   it 'is authenticated' do
     authenticated_stub = stub_request(:any, url).with(
@@ -18,7 +15,7 @@ RSpec.describe GraylogAPI::Client do
 
   it 'sends the right headers' do
     headers_stub = stub_request(:any, url).with(
-      headers: {Accept: 'application/json', 'X-Requested-By': 'Graylog API bot' }
+      headers: { Accept: 'application/json', 'X-Requested-By': 'Graylog API bot' }
     )
     client.post('/endpoint', 'irrelevant')
     expect(headers_stub).to have_been_requested.once
@@ -86,27 +83,17 @@ RSpec.describe GraylogAPI::Client do
         response = client.put('/endpoint', pay: 'load')
         expect(response.body).to eq(key: 'value')
       end
-
-      it 'can receive an optional id' do
-        stub_request(:put, "#{url}/123")
-
-        response = client.put('/endpoint', { pay: 'load' }, id: '123')
-        expect(WebMock).to have_requested(:put, 'https://test.com/api/endpoint/123')
-      end
     end
 
     describe '#delete' do
-      let(:delete_url) { "#{url}/#{id}" }
-      let(:id) { '123456' }
-
       before do
-        stub_request(:delete, delete_url).to_return(
+        stub_request(:delete, url).to_return(
           status: 204, body: '', headers: { 'Content-Type': 'application/json' }
         )
       end
 
       it 'is successful' do
-        expect(client.delete('/endpoint', id)).to be_successful
+        expect(client.delete('/endpoint')).to be_successful
       end
     end
   end
@@ -119,7 +106,7 @@ RSpec.describe GraylogAPI::Client do
     end
 
     it 'returns the type of error' do
-      expect(client.get('/endpoint').body[:type]).to eq('HTTP::TimeoutError')
+      expect(client.delete('/endpoint').body[:type]).to eq('HTTP::TimeoutError')
     end
 
     it 'returns the error message' do

@@ -41,6 +41,71 @@ RSpec.describe App do
     end
   end
 
+  describe '#image_source' do
+    it 'is ECR by default' do
+      expect(app_named('test').image_source).to eq('ecr')
+    end
+
+    it 'can be dockerhub' do
+      expect(app_named('test', image_source: 'dockerhub').errors.messages).to be_empty
+    end
+
+    it 'can only have allowed values' do
+      app = app_named('test', image_source: 'notallowed')
+      expect(app.errors.messages[:image_source]).to include('is not included in the list')
+    end
+  end
+
+  describe '#repository_name' do
+    it 'can not be blank' do
+      app = app_named('test', repository_name: nil)
+      expect(app.errors.messages[:repository_name]).to include("can't be blank")
+    end
+  end
+
+  describe '#job_spec' do
+    it 'can not be blank' do
+      app = app_named('test', job_spec: nil)
+      expect(app.errors.messages[:job_spec]).to include("can't be blank")
+    end
+  end
+
+  describe '#graylog_stream' do
+    context 'when optional' do
+      it 'can be missing' do
+        expect(app_named('test').errors.messages[:base]).to be_empty
+      end
+
+      it 'can be present' do
+        expect(app_with_stream.errors.messages[:base]).to be_empty
+      end
+    end
+
+    context 'when not optional' do
+      it 'can not be missing' do
+        app = app_named('test', validate_stream: true)
+        expect(app.errors.messages[:base]).to include('Could not create Graylog stream')
+      end
+
+      it 'must be present' do
+        app = app_with_stream(validate_stream: true)
+        expect(app.errors.messages[:base]).to be_empty
+      end
+    end
+
+    def app_with_stream(options = {})
+      app = App.new(
+        { name: 'test', repository_name: 'test', job_spec: 'job {}' }.merge(options)
+      )
+      app.build_graylog_stream
+      app.graylog_stream.assign_attributes(
+        id: '1', name: 'test', rule_value: 'test', index_set_id: '42'
+      )
+      app.save
+      app
+    end
+  end
+
   describe '#trigger_auto_deploy' do
     it 'returns nil if app is autodeploy disabled' do
       notification = notification_for('master')

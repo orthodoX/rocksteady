@@ -11,7 +11,7 @@ module GraylogAPI
       body = response.parse
       return {} if body.empty?
 
-      body.transform_keys(&:to_sym)
+      body.deep_symbolize_keys
     end
 
     def successful?
