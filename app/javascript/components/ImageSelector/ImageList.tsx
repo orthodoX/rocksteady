@@ -44,6 +44,8 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
 
   public componentDidMount() {
     this.handleFiltersChanged = this.handleFiltersChanged.bind(this);
+    this.imageLatestFilter = this.imageLatestFilter.bind(this);
+    this.imageMainFilter = this.imageMainFilter.bind(this);
     this.fetchData();
   }
 
@@ -129,13 +131,21 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
     });
   }
 
-  handleFiltersChanged(event) {
+  handleFiltersChanged(event: any) {
     const value = event.target.checked;
     const name = event.target.name;
-    this.setState(
-      { [name]: value },
-      () => this.setState( { displayedImages: this.filterImages(this.state.images) } )
-    );
+    if (name == 'isMainOnly') {
+      this.setState(
+        { isMainOnly: value },
+        () => this.setState( { displayedImages: this.filterImages(this.state.images) } )
+      );
+    }
+    if (name == 'isLatestOnly') {
+      this.setState(
+        { isLatestOnly: value },
+        () => this.setState( { displayedImages: this.filterImages(this.state.images) } )
+      );
+    }
   }
 
   private taggify(tags: string[], isActive: boolean) {
@@ -146,11 +156,12 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
 
   private async fetchData() {
     try {
-      const images = await this.fetchImageList();
-      const displayedImages = this.filterImages(images);
       const currentImageTag = await this.fetchDeployedImageTag();
-
-      this.setState({ loading: false, images, displayedImages, currentImageTag });
+      const images = await this.fetchImageList();
+      this.setState(
+        { images, currentImageTag },
+        () => this.setState( { loading: false, displayedImages: this.filterImages(images) } )
+      );
     } catch (_) {
       this.setState({ error: true, loading: false });
     }
@@ -162,19 +173,19 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
     return json.map((d: { [s: string]: any }) => new Image(d));
   }
 
-  private imageMainFilter(image) {
+  private imageMainFilter(image: Image) {
     return image.tags.some((tag) =>
-      /^(master|main)/.test(tag)
+      /^(master|main)/.test(tag) || tag == this.state.currentImageTag
     );
   }
 
-  private imageLatestFilter(image) {
+  private imageLatestFilter(image: Image) {
     return image.tags.some((tag) =>
-      /latest$/.test(tag)
+      /latest$/.test(tag) || tag == this.state.currentImageTag
     );
   }
 
-  private filterImages(images) {
+  private filterImages(images: Image[]) {
     let filteredImages = images;
     if (this.state.isMainOnly) {
       filteredImages = filteredImages.filter(this.imageMainFilter);
