@@ -16,13 +16,18 @@ interface ImageListProps {
   repositoryName: string;
   onSelect: (image: Image) => void;
   selectedImage?: Image;
+  isMainOnlyDefault: boolean;
+  isLatestOnlyDefault: boolean;
 }
 
 interface ImageListState {
   loading: boolean;
   error: boolean;
   images: Image[];
+  displayedImages: Image[];
   currentImageTag: string;
+  isMainOnly: boolean;
+  isLatestOnly: boolean;
 }
 
 export default class ImageList extends React.Component<ImageListProps, ImageListState> {
@@ -30,11 +35,17 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
   public state: ImageListState = {
     error: false,
     images: [],
+    displayedImages: [],
     loading: true,
-    currentImageTag: ''
+    currentImageTag: '',
+    isMainOnly: this.props.isMainOnlyDefault,
+    isLatestOnly: this.props.isLatestOnlyDefault
   };
 
   public componentDidMount() {
+    this.handleFiltersChanged = this.handleFiltersChanged.bind(this);
+    this.imageLatestFilter = this.imageLatestFilter.bind(this);
+    this.imageMainFilter = this.imageMainFilter.bind(this);
     this.fetchData();
   }
 
@@ -42,6 +53,7 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
     return (
       <div className='ImageList'>
         <h4>Available images</h4>
+        { this.filters }
         { this.state.loading ? this.loadingMessage : this.content }
       </div>
     );
@@ -51,12 +63,39 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
     return <div className='ImageList-loadingMessage alert alert-secondary'>Loading images…</div>;
   }
 
+  private get filters() {
+    return (
+      <div className='form-group'>
+        <div className='form-check form-check-inline'>
+          <input
+            id='isMainOnly'
+            name='isMainOnly'
+            type='checkbox'
+            className='form-check-input'
+            checked={this.state.isMainOnly}
+            onChange={this.handleFiltersChanged} />
+          <label htmlFor='isMainOnly' className='form-check-label'>Show main/master only</label>
+        </div>
+        <div className='form-check form-check-inline'>
+          <input
+            id='isLatestOnly'
+            name='isLatestOnly'
+            type='checkbox'
+            className='form-check-input'
+            checked={this.state.isLatestOnly}
+            onChange={this.handleFiltersChanged} />
+          <label htmlFor='isLatestOnly' className='form-check-label'>Show latest only</label>
+        </div>
+      </div>
+    );
+  }
+
   private get content() {
     if (this.state.error) return this.errorMessage;
 
     return (
       <div className='list-group'>
-        { this.state.images.length ? this.imageRows : this.emptyRow }
+        { this.state.displayedImages.length ? this.imageRows : this.emptyRow }
       </div>
     );
   }
@@ -74,7 +113,7 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
   }
 
   private get imageRows() {
-    return this.state.images.map((image) => {
+    return this.state.displayedImages.map((image) => {
       const isActive = !!(this.props.selectedImage && this.props.selectedImage.id === image.id);
       const className = `list-group-item flex-column align-items-start ${ isActive ? 'active' : 'not-active'}`;
       const isDeployed = _.includes(image.tags, this.state.currentImageTag);
@@ -92,6 +131,23 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
     });
   }
 
+  handleFiltersChanged(event: any) {
+    const value = event.target.checked;
+    const name = event.target.name;
+    if (name == 'isMainOnly') {
+      this.setState(
+        { isMainOnly: value },
+        () => this.setState( { displayedImages: this.filterImages(this.state.images) } )
+      );
+    }
+    if (name == 'isLatestOnly') {
+      this.setState(
+        { isLatestOnly: value },
+        () => this.setState( { displayedImages: this.filterImages(this.state.images) } )
+      );
+    }
+  }
+
   private taggify(tags: string[], isActive: boolean) {
     return tags.map((tag) =>
       <span key={ tag } className={ `badge ${isActive ? 'badge-light' : 'badge-primary'}` }>{ tag }</span>,
@@ -100,10 +156,12 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
 
   private async fetchData() {
     try {
-      const images = await this.fetchImageList();
       const currentImageTag = await this.fetchDeployedImageTag();
-
-      this.setState({ loading: false, images, currentImageTag });
+      const images = await this.fetchImageList();
+      this.setState(
+        { images, currentImageTag },
+        () => this.setState( { loading: false, displayedImages: this.filterImages(images) } )
+      );
     } catch (_) {
       this.setState({ error: true, loading: false });
     }
@@ -113,6 +171,29 @@ export default class ImageList extends React.Component<ImageListProps, ImageList
     const data = await fetch(this.props.endpoint);
     const json = await data.json();
     return json.map((d: { [s: string]: any }) => new Image(d));
+  }
+
+  private imageMainFilter(image: Image) {
+    return image.tags.some((tag) =>
+      /^(master|main)/.test(tag) || tag == this.state.currentImageTag
+    );
+  }
+
+  private imageLatestFilter(image: Image) {
+    return image.tags.some((tag) =>
+      /latest$/.test(tag) || tag == this.state.currentImageTag
+    );
+  }
+
+  private filterImages(images: Image[]) {
+    let filteredImages = images;
+    if (this.state.isMainOnly) {
+      filteredImages = filteredImages.filter(this.imageMainFilter);
+    }
+    if (this.state.isLatestOnly) {
+      filteredImages = filteredImages.filter(this.imageLatestFilter);
+    }
+    return filteredImages;
   }
 
   private async fetchDeployedImageTag() {
